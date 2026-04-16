@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tomorro — Customer Sentiment Dashboard</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #1a1a2e; color: #e0e0e0; min-height: 100vh; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+header { text-align: center; padding: 32px 0 24px; border-bottom: 1px solid #2a2a4a; margin-bottom: 32px; }
+header h1 { font-size: 28px; color: #fff; margin-bottom: 8px; }
+header .subtitle { color: #888; font-size: 14px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.kpi-card { background: #16213e; border-radius: 12px; padding: 20px; text-align: center; border: 1px solid #2a2a4a; }
+.kpi-card .kpi-value { font-size: 36px; font-weight: 700; margin: 8px 0; }
+.kpi-card .kpi-label { font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.kpi-card.alert .kpi-value { color: #e71d36; }
+.kpi-card.excellent .kpi-value { color: #2ec4b6; }
+.kpi-card.attention .kpi-value { color: #ff9f1c; }
+.kpi-card.avg .kpi-value { color: #4361ee; }
+.kpi-card.nodata .kpi-value { color: #666; }
+.controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.controls input { background: #16213e; border: 1px solid #2a2a4a; color: #e0e0e0; padding: 10px 16px; border-radius: 8px; font-size: 14px; flex: 1; min-width: 200px; }
+.controls input::placeholder { color: #666; }
+.controls select { background: #16213e; border: 1px solid #2a2a4a; color: #e0e0e0; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+.controls button { background: #4361ee; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+.controls button:hover { background: #3451de; }
+table { width: 100%; border-collapse: collapse; background: #16213e; border-radius: 12px; overflow: hidden; }
+thead { background: #0f3460; }
+th { padding: 14px 16px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #aaa; cursor: pointer; user-select: none; white-space: nowrap; }
+th:hover { color: #fff; }
+td { padding: 14px 16px; border-top: 1px solid #1a1a2e; font-size: 14px; }
+tr.clickable { cursor: pointer; transition: background 0.15s; }
+tr.clickable:hover { background: #1a2a4e; }
+.score-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-weight: 700; font-size: 14px; min-width: 36px; text-align: center; }
+.score-3 { background: #2ec4b6; color: #1a1a2e; }
+.score-2 { background: #ff9f1c; color: #1a1a2e; }
+.score-1 { background: #e71d36; color: #fff; }
+.score-na { background: #333; color: #888; }
+.trend { font-size: 18px; }
+.trend-up { color: #2ec4b6; }
+.trend-stable { color: #ff9f1c; }
+.trend-down { color: #e71d36; }
+.sentiment-positif { color: #2ec4b6; }
+.sentiment-neutre { color: #ff9f1c; }
+.sentiment-negatif { color: #e71d36; }
+.detail-row { display: none; }
+.detail-row td { padding: 0; }
+.detail-content { padding: 20px 24px; background: #0f1a2e; }
+.detail-content h4 { color: #4361ee; margin-bottom: 12px; font-size: 15px; }
+.call-card { background: #16213e; border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; border-left: 3px solid #4361ee; }
+.call-card .call-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.call-card .call-date { color: #888; font-size: 12px; }
+.call-card .call-title { font-weight: 600; color: #fff; font-size: 14px; }
+.call-card .call-sentiment { font-size: 12px; padding: 2px 10px; border-radius: 10px; }
+.call-card .call-summary { color: #bbb; font-size: 13px; line-height: 1.5; margin-top: 6px; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; margin: 2px 4px 2px 0; }
+.pill-problem { background: rgba(231,29,54,0.15); color: #e71d36; }
+.pill-feature { background: rgba(67,97,238,0.15); color: #4361ee; }
+.link { color: #4361ee; text-decoration: none; }
+.link:hover { text-decoration: underline; }
+.no-data { color: #666; font-style: italic; }
+footer { text-align: center; padding: 32px 0; color: #444; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>Tomorro — Customer Sentiment Dashboard</h1>
+<div class="subtitle">Généré le 16/04/2026 à 11h16 · 30 clients analysés (phase Run) · Données Modjo × HubSpot</div>
+</header>
+
+<div class="kpi-grid">
+<div class="kpi-card excellent">
+<div class="kpi-label">Excellent (Score 3)</div>
+<div class="kpi-value">9</div>
+<div class="kpi-label">30% des clients</div>
+</div>
+<div class="kpi-card attention">
+<div class="kpi-label">Attention (Score 2)</div>
+<div class="kpi-value">9</div>
+<div class="kpi-label">30% des clients</div>
+</div>
+<div class="kpi-card alert">
+<div class="kpi-label">Alerte (Score 1)</div>
+<div class="kpi-value">4</div>
+<div class="kpi-label">13% des clients</div>
+</div>
+<div class="kpi-card avg">
+<div class="kpi-label">Score Moyen</div>
+<div class="kpi-value">2.23</div>
+<div class="kpi-label">sur 3</div>
+</div>
+<div class="kpi-card nodata">
+<div class="kpi-label">Sans données</div>
+<div class="kpi-value">8</div>
+<div class="kpi-label">27% des clients</div>
+</div>
+</div>
+
+<div class="controls">
+<input type="text" id="search" placeholder="Rechercher un client..." oninput="filterTable()">
+<select id="filterScore" onchange="filterTable()">
+<option value="all">Tous les scores</option>
+<option value="1">🔴 Alerte (1)</option>
+<option value="2">🟠 Attention (2)</option>
+<option value="3">🟢 Excellent (3)</option>
+<option value="na">Sans données</option>
+</select>
+<select id="filterSegment" onchange="filterTable()">
+<option value="all">Tous les segments</option>
+<option value="Enterprise">Enterprise</option>
+<option value="Strategic Account">Strategic Account</option>
+<option value="Key Account">Key Account</option>
+<option value="Medium Account">Medium Account</option>
+<option value="Small Account">Small Account</option>
+</select>
+<button onclick="exportCSV()">📥 Export CSV</button>
+</div>
+
+<table id="mainTable">
+<thead>
+<tr>
+<th onclick="sortTable(0)">Client ⇅</th>
+<th onclick="sortTable(1)">Segment ⇅</th>
+<th onclick="sortTable(2)">Score ⇅</th>
+<th>Tendance</th>
+<th>Sentiment</th>
+<th onclick="sortTable(5)">Dernier appel ⇅</th>
+<th>Problèmes clés</th>
+<th>Demandes features</th>
+</tr>
+</thead>
+<tbody>
+<tr class="clickable" onclick="toggleDetail('46467510315')" data-score="na" data-segment="Key Account" data-name="cité internationale universitaire de paris - rh">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/46467510315" target="_blank" class="link" onclick="event.stopPropagation()">Cité internationale universitaire de Paris - RH</a></td>
+<td>Key Account</td>
+<td><span class="score-badge score-na">N/A</span></td>
+<td><span class="trend trend-stable">—</span></td>
+<td><span class="">—</span></td>
+<td>—</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-46467510315">
+<td colspan="8">
+<div class="detail-content">
+<h4>Cité internationale universitaire de Paris - RH</h4>
+<p class="no-data">Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.</p>
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('45987145386')" data-score="na" data-segment="Small Account" data-name="cheerz rh">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/45987145386" target="_blank" class="link" onclick="event.stopPropagation()">Cheerz RH</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-na">N/A</span></td>
+<td><span class="trend trend-stable">—</span></td>
+<td><span class="">—</span></td>
+<td>—</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-45987145386">
+<td colspan="8">
+<div class="detail-content">
+<h4>Cheerz RH</h4>
+<p class="no-data">Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.</p>
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('44788785503')" data-score="na" data-segment="Key Account" data-name="pasqal - corporate">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/44788785503" target="_blank" class="link" onclick="event.stopPropagation()">Pasqal - Corporate</a></td>
+<td>Key Account</td>
+<td><span class="score-badge score-na">N/A</span></td>
+<td><span class="trend trend-stable">—</span></td>
+<td><span class="">—</span></td>
+<td>—</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-44788785503">
+<td colspan="8">
+<div class="detail-content">
+<h4>Pasqal - Corporate</h4>
+<p class="no-data">Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.</p>
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('41392015388')" data-score="3" data-segment="Medium Account" data-name="polarise">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/41392015388" target="_blank" class="link" onclick="event.stopPropagation()">Polarise</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-up">↑</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-03-18</td>
+<td><span class="no-data">—</span></td>
+<td><span class="pill pill-feature">Amélioration du workflow de signature</span></td>
+</tr>
+<tr class="detail-row" id="detail-41392015388">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — Polarise</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point de suivi Polarise</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-18</span>
+</div>
+</div>
+<div class="call-summary">Client très satisfait de la plateforme. Utilisation en croissance. Bon feedback sur les dernières fonctionnalités déployées.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Revue trimestrielle Polarise</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-12</span>
+</div>
+</div>
+<div class="call-summary">Bilan très positif. Le client recommande Tomorro en interne. Pas de problème remonté.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Check-in Polarise</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-15</span>
+</div>
+</div>
+<div class="call-summary">Point rapide, tout fonctionne bien. Quelques questions sur les nouvelles fonctionnalités.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('40695694084')" data-score="na" data-segment="Medium Account" data-name="ozi sas">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/40695694084" target="_blank" class="link" onclick="event.stopPropagation()">Ozi SAS</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-na">N/A</span></td>
+<td><span class="trend trend-stable">—</span></td>
+<td><span class="">—</span></td>
+<td>—</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-40695694084">
+<td colspan="8">
+<div class="detail-content">
+<h4>Ozi SAS</h4>
+<p class="no-data">Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.</p>
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('35599744087')" data-score="na" data-segment="Small Account" data-name="kalhyge">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/35599744087" target="_blank" class="link" onclick="event.stopPropagation()">Kalhyge</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-na">N/A</span></td>
+<td><span class="trend trend-stable">—</span></td>
+<td><span class="">—</span></td>
+<td>—</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-35599744087">
+<td colspan="8">
+<div class="detail-content">
+<h4>Kalhyge</h4>
+<p class="no-data">Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.</p>
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('35251683353')" data-score="na" data-segment="Small Account" data-name="vertone rh">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/35251683353" target="_blank" class="link" onclick="event.stopPropagation()">Vertone RH</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-na">N/A</span></td>
+<td><span class="trend trend-stable">—</span></td>
+<td><span class="">—</span></td>
+<td>—</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-35251683353">
+<td colspan="8">
+<div class="detail-content">
+<h4>Vertone RH</h4>
+<p class="no-data">Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.</p>
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('34261862152')" data-score="1" data-segment="Enterprise" data-name="gl events rh">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34261862152" target="_blank" class="link" onclick="event.stopPropagation()">GL Events RH</a></td>
+<td>Enterprise</td>
+<td><span class="score-badge score-1">1</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-négatif">Négatif</span></td>
+<td>2026-03-25</td>
+<td><span class="pill pill-problem">Problèmes récurrents d'intégration</span> <span class="pill pill-problem">Lenteurs signalées sur l'éditeur</span> <span class="pill pill-problem">Manque de support réactif</span></td>
+<td><span class="pill pill-feature">Intégration SIRH améliorée</span> <span class="pill pill-feature">Performance éditeur</span></td>
+</tr>
+<tr class="detail-row" id="detail-34261862152">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 4 derniers appels — GL Events RH</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Escalade GL Events RH</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-03-25</span>
+</div>
+</div>
+<div class="call-summary">Client frustré par des bugs récurrents sur l'intégration SIRH. Menace de réévaluer l'outil si pas d'amélioration rapide.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point GL Events RH</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-03-05</span>
+</div>
+</div>
+<div class="call-summary">Remontée de lenteurs sur l'éditeur de contrats. Le client exprime son mécontentement sur le temps de résolution des tickets.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi GL Events RH</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-02-10</span>
+</div>
+</div>
+<div class="call-summary">Problèmes d'intégration toujours non résolus. Le client est très mécontent.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Bilan GL Events RH</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-20</span>
+</div>
+</div>
+<div class="call-summary">Discussion sur les axes d'amélioration. Le client reste prudent mais ouvert.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('34245827142')" data-score="2" data-segment="Small Account" data-name="panda">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34245827142" target="_blank" class="link" onclick="event.stopPropagation()">Panda</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-03-10</td>
+<td><span class="pill pill-problem">Quelques difficultés d'adoption par les équipes</span></td>
+<td><span class="pill pill-feature">Modèles de contrats plus flexibles</span></td>
+</tr>
+<tr class="detail-row" id="detail-34245827142">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Panda</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Panda/WWF</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-03-10</span>
+</div>
+</div>
+<div class="call-summary">Utilisation stable mais limitée. Le client souhaite plus de modèles de contrats adaptés à leur secteur.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Panda</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-28</span>
+</div>
+</div>
+<div class="call-summary">Pas de problème majeur. Adoption encore partielle au sein des équipes.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('34259224328')" data-score="2" data-segment="Enterprise" data-name="rémy cointreau - cep">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34259224328" target="_blank" class="link" onclick="event.stopPropagation()">Rémy Cointreau - CEP</a></td>
+<td>Enterprise</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-03-20</td>
+<td><span class="pill pill-problem">Complexité de configuration pour les contrats internationaux</span></td>
+<td><span class="pill pill-feature">Support multi-langue amélioré</span> <span class="pill pill-feature">Gestion des entités juridiques</span></td>
+</tr>
+<tr class="detail-row" id="detail-34259224328">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — Rémy Cointreau - CEP</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Revue Rémy Cointreau</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-03-20</span>
+</div>
+</div>
+<div class="call-summary">Le client utilise bien la plateforme mais remonte la complexité pour les contrats multi-entités internationaux.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Rémy Cointreau</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-15</span>
+</div>
+</div>
+<div class="call-summary">Bonne satisfaction globale. Quelques demandes d'évolution sur le multi-langue.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Check-in Rémy Cointreau</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-10</span>
+</div>
+</div>
+<div class="call-summary">Utilisation régulière. Le client attend des améliorations sur la gestion des entités juridiques.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('33827234094')" data-score="3" data-segment="Medium Account" data-name="drama paris">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33827234094" target="_blank" class="link" onclick="event.stopPropagation()">Drama Paris</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-up">↑</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-04-02</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-33827234094">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — Drama Paris</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Drama Paris</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-04-02</span>
+</div>
+</div>
+<div class="call-summary">Excellent retour. Le client est très enthousiaste sur les gains de temps réalisés grâce à Tomorro.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Drama Paris</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-20</span>
+</div>
+</div>
+<div class="call-summary">Adoption complète par les équipes. Le client envisage d'étendre l'usage à d'autres départements.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Bilan Drama Paris</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-05</span>
+</div>
+</div>
+<div class="call-summary">Bon bilan de fin d'année. Quelques ajustements demandés mais rien de bloquant.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('33695278612')" data-score="na" data-segment="Strategic Account" data-name="infopro digital rh">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33695278612" target="_blank" class="link" onclick="event.stopPropagation()">Infopro Digital RH</a></td>
+<td>Strategic Account</td>
+<td><span class="score-badge score-na">N/A</span></td>
+<td><span class="trend trend-stable">—</span></td>
+<td><span class="">—</span></td>
+<td>—</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-33695278612">
+<td colspan="8">
+<div class="detail-content">
+<h4>Infopro Digital RH</h4>
+<p class="no-data">Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.</p>
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('50095592233')" data-score="3" data-segment="Small Account" data-name="enix">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/50095592233" target="_blank" class="link" onclick="event.stopPropagation()">Enix</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-03-28</td>
+<td><span class="no-data">—</span></td>
+<td><span class="pill pill-feature">API d'export</span></td>
+</tr>
+<tr class="detail-row" id="detail-50095592233">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Enix</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Enix</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-28</span>
+</div>
+</div>
+<div class="call-summary">Le client est satisfait. Utilisation fluide et régulière. Demande mineure sur l'API d'export.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Enix</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-18</span>
+</div>
+</div>
+<div class="call-summary">Tout fonctionne bien. Le client apprécie la simplicité de l'outil.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('25976217869')" data-score="2" data-segment="Medium Account" data-name="habitation batiment">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/25976217869" target="_blank" class="link" onclick="event.stopPropagation()">Habitation Batiment</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-03-12</td>
+<td><span class="pill pill-problem">Difficulté à former les nouveaux arrivants</span></td>
+<td><span class="pill pill-feature">Tutoriels intégrés</span> <span class="pill pill-feature">Parcours d'onboarding utilisateur</span></td>
+</tr>
+<tr class="detail-row" id="detail-25976217869">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Habitation Batiment</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Habitation Batiment</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-03-12</span>
+</div>
+</div>
+<div class="call-summary">Le client remonte des difficultés pour former les nouveaux utilisateurs. Souhaite des tutoriels intégrés.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Habitation Batiment</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-02-05</span>
+</div>
+</div>
+<div class="call-summary">Utilisation correcte mais pas optimale. Le client aimerait un meilleur onboarding pour ses équipes.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('42606417725')" data-score="na" data-segment="Small Account" data-name="gp explorer">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/42606417725" target="_blank" class="link" onclick="event.stopPropagation()">GP Explorer</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-na">N/A</span></td>
+<td><span class="trend trend-stable">—</span></td>
+<td><span class="">—</span></td>
+<td>—</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-42606417725">
+<td colspan="8">
+<div class="detail-content">
+<h4>GP Explorer</h4>
+<p class="no-data">Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.</p>
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('25089959216')" data-score="1" data-segment="Small Account" data-name="pousse">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/25089959216" target="_blank" class="link" onclick="event.stopPropagation()">POUSSE</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-1">1</span></td>
+<td><span class="trend trend-down">↓</span></td>
+<td><span class="sentiment-négatif">Négatif</span></td>
+<td>2026-04-05</td>
+<td><span class="pill pill-problem">Bugs fréquents sur la signature électronique</span> <span class="pill pill-problem">Temps de réponse support trop long</span> <span class="pill pill-problem">Fonctionnalités manquantes vs concurrent</span></td>
+<td><span class="pill pill-feature">Signature mobile</span> <span class="pill pill-feature">Rappels automatiques</span></td>
+</tr>
+<tr class="detail-row" id="detail-25089959216">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — POUSSE</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Escalade POUSSE</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-04-05</span>
+</div>
+</div>
+<div class="call-summary">Le client menace de churner. Bugs récurrents sur la signature électronique. Très insatisfait du support.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point POUSSE</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-03-15</span>
+</div>
+</div>
+<div class="call-summary">Nouvelles remontées de bugs. Le client compare défavorablement Tomorro à un concurrent.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi POUSSE</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-02-08</span>
+</div>
+</div>
+<div class="call-summary">Quelques irritants mais le client reste ouvert. Demande d'améliorations sur la signature mobile.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('11178856724')" data-score="2" data-segment="Small Account" data-name="avignon tourisme">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/11178856724" target="_blank" class="link" onclick="event.stopPropagation()">Avignon Tourisme</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-03-01</td>
+<td><span class="pill pill-problem">Lenteur occasionnelle</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-11178856724">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Avignon Tourisme</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Avignon Tourisme</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-03-01</span>
+</div>
+</div>
+<div class="call-summary">Utilisation régulière sans problème majeur. Quelques lenteurs signalées ponctuellement.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Avignon Tourisme</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-22</span>
+</div>
+</div>
+<div class="call-summary">Le client est globalement satisfait. Usage basique mais efficace.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('34668485696')" data-score="3" data-segment="Medium Account" data-name="liora (ex datascientest)">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34668485696" target="_blank" class="link" onclick="event.stopPropagation()">Liora (ex DataScientest)</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-up">↑</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-04-08</td>
+<td><span class="no-data">—</span></td>
+<td><span class="pill pill-feature">Dashboard analytics</span></td>
+</tr>
+<tr class="detail-row" id="detail-34668485696">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — Liora (ex DataScientest)</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Liora</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-04-08</span>
+</div>
+</div>
+<div class="call-summary">Très bon feedback. Le client a déployé Tomorro dans toute l'organisation. Satisfaction élevée.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Revue Liora</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-05</span>
+</div>
+</div>
+<div class="call-summary">Adoption exemplaire. Le client demande un dashboard analytics pour suivre l'activité contractuelle.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Check-in Liora</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-30</span>
+</div>
+</div>
+<div class="call-summary">Bonne utilisation. Quelques questions sur les fonctionnalités avancées.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('11176687685')" data-score="2" data-segment="Small Account" data-name="le point">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/11176687685" target="_blank" class="link" onclick="event.stopPropagation()">Le Point</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-up">↑</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-03-22</td>
+<td><span class="pill pill-problem">Complexité perçue pour les utilisateurs non-juristes</span></td>
+<td><span class="pill pill-feature">Interface simplifiée</span></td>
+</tr>
+<tr class="detail-row" id="detail-11176687685">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — Le Point</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Le Point</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-22</span>
+</div>
+</div>
+<div class="call-summary">Amélioration notable de la satisfaction. Le client commence à voir la valeur après une phase d'adaptation.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Le Point</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-02-14</span>
+</div>
+</div>
+<div class="call-summary">Le client trouve l'outil encore complexe pour certains utilisateurs non-juristes.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Bilan Le Point</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-08</span>
+</div>
+</div>
+<div class="call-summary">Usage en progression. Le client demande une interface plus intuitive.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('11146959986')" data-score="3" data-segment="Medium Account" data-name="tikamoon">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/11146959986" target="_blank" class="link" onclick="event.stopPropagation()">Tikamoon</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-03-15</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-11146959986">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Tikamoon</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Tikamoon</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-15</span>
+</div>
+</div>
+<div class="call-summary">Client fidèle et satisfait. Utilisation quotidienne de l'outil. Aucun problème remonté.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Tikamoon</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-01</span>
+</div>
+</div>
+<div class="call-summary">Tout roule. Le client est un ambassadeur de Tomorro dans son réseau.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('11147153965')" data-score="3" data-segment="Medium Account" data-name="maat pharma">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/11147153965" target="_blank" class="link" onclick="event.stopPropagation()">MaaT Pharma</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-03-28</td>
+<td><span class="no-data">—</span></td>
+<td><span class="pill pill-feature">Clause library étendue pour pharma</span></td>
+</tr>
+<tr class="detail-row" id="detail-11147153965">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — MaaT Pharma</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point MaaT Pharma</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-28</span>
+</div>
+</div>
+<div class="call-summary">Très bonne satisfaction. L'outil répond aux besoins spécifiques du secteur pharma. Demande d'enrichissement de la clause library.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Revue MaaT Pharma</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-20</span>
+</div>
+</div>
+<div class="call-summary">Le client apprécie la conformité et la traçabilité. Bon feedback global.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('22123971242')" data-score="2" data-segment="Small Account" data-name="groupe eleven">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/22123971242" target="_blank" class="link" onclick="event.stopPropagation()">Groupe Eleven</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-03-08</td>
+<td><span class="pill pill-problem">Sous-utilisation des fonctionnalités avancées</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-22123971242">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Groupe Eleven</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Groupe Eleven</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-03-08</span>
+</div>
+</div>
+<div class="call-summary">Le client utilise l'outil de manière basique. Potentiel d'adoption plus large non exploité.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Groupe Eleven</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-25</span>
+</div>
+</div>
+<div class="call-summary">Pas de problème mais pas d'enthousiasme non plus. Le client reste sur un usage minimal.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('11142892876')" data-score="2" data-segment="Small Account" data-name="pharmafield groupe">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/11142892876" target="_blank" class="link" onclick="event.stopPropagation()">Pharmafield Groupe</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-03-18</td>
+<td><span class="pill pill-problem">Manque de visibilité sur le ROI</span></td>
+<td><span class="pill pill-feature">Reporting ROI</span></td>
+</tr>
+<tr class="detail-row" id="detail-11142892876">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Pharmafield Groupe</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Pharmafield</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-03-18</span>
+</div>
+</div>
+<div class="call-summary">Le client utilise l'outil correctement mais questionne le ROI. Souhaite des métriques de performance.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Pharmafield</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-02-10</span>
+</div>
+</div>
+<div class="call-summary">Utilisation stable. Le client aimerait un reporting plus détaillé.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('11143242280')" data-score="1" data-segment="Small Account" data-name="tapnation">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/11143242280" target="_blank" class="link" onclick="event.stopPropagation()">TapNation</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-1">1</span></td>
+<td><span class="trend trend-down">↓</span></td>
+<td><span class="sentiment-négatif">Négatif</span></td>
+<td>2026-04-01</td>
+<td><span class="pill pill-problem">Fonctionnalités insuffisantes pour le gaming</span> <span class="pill pill-problem">Mauvaise expérience utilisateur</span> <span class="pill pill-problem">Lenteurs chroniques</span></td>
+<td><span class="pill pill-feature">Templates secteur gaming</span> <span class="pill pill-feature">Performance globale</span></td>
+</tr>
+<tr class="detail-row" id="detail-11143242280">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — TapNation</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Escalade TapNation</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-04-01</span>
+</div>
+</div>
+<div class="call-summary">Client très mécontent. L'outil ne correspond pas aux besoins spécifiques du secteur gaming. Envisage des alternatives.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point TapNation</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-03-10</span>
+</div>
+</div>
+<div class="call-summary">Remontées multiples : lenteurs, UX insuffisante, manque de templates adaptés.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi TapNation</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-02-05</span>
+</div>
+</div>
+<div class="call-summary">Le client exprime des réserves mais reste en discussion.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('11141446818')" data-score="2" data-segment="Small Account" data-name="heroiks">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/11141446818" target="_blank" class="link" onclick="event.stopPropagation()">HEROIKS</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-03-20</td>
+<td><span class="pill pill-problem">Formation insuffisante des équipes</span></td>
+<td><span class="pill pill-feature">Onboarding amélioré</span></td>
+</tr>
+<tr class="detail-row" id="detail-11141446818">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — HEROIKS</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point HEROIKS</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-03-20</span>
+</div>
+</div>
+<div class="call-summary">Le client est neutre. L'adoption progresse lentement. Besoin d'un meilleur accompagnement à l'onboarding.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi HEROIKS</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-02-12</span>
+</div>
+</div>
+<div class="call-summary">Utilisation en cours de déploiement. Pas de problème majeur mais pas d'enthousiasme.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('10574668345')" data-score="3" data-segment="Medium Account" data-name="yogosha">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/10574668345" target="_blank" class="link" onclick="event.stopPropagation()">Yogosha</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-03-25</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-10574668345">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Yogosha</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Yogosha</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-25</span>
+</div>
+</div>
+<div class="call-summary">Client très satisfait. L'outil est parfaitement intégré dans leur workflow. Aucune friction.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Yogosha</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-15</span>
+</div>
+</div>
+<div class="call-summary">Adoption complète. Le client salue la qualité du produit et du support.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('10485002793')" data-score="3" data-segment="Medium Account" data-name="stade toulousain rugby">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/10485002793" target="_blank" class="link" onclick="event.stopPropagation()">Stade Toulousain Rugby</a></td>
+<td>Medium Account</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-stable">→</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-03-30</td>
+<td><span class="no-data">—</span></td>
+<td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-10485002793">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 2 derniers appels — Stade Toulousain Rugby</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Stade Toulousain</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-30</span>
+</div>
+</div>
+<div class="call-summary">Très bon retour. Le club utilise Tomorro pour tous ses contrats partenaires. Grande satisfaction.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Stade Toulousain</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-22</span>
+</div>
+</div>
+<div class="call-summary">Utilisation exemplaire. Le client est un promoteur actif de Tomorro.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('48178785178')" data-score="2" data-segment="Key Account" data-name="pasqal">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/48178785178" target="_blank" class="link" onclick="event.stopPropagation()">Pasqal</a></td>
+<td>Key Account</td>
+<td><span class="score-badge score-2">2</span></td>
+<td><span class="trend trend-down">↓</span></td>
+<td><span class="sentiment-neutre">Neutre</span></td>
+<td>2026-04-10</td>
+<td><span class="pill pill-problem">Complexité des workflows multi-approbateurs</span> <span class="pill pill-problem">Temps de chargement</span></td>
+<td><span class="pill pill-feature">Workflow d'approbation simplifié</span> <span class="pill pill-feature">Performance</span></td>
+</tr>
+<tr class="detail-row" id="detail-48178785178">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — Pasqal</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Pasqal</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-04-10</span>
+</div>
+</div>
+<div class="call-summary">Le client remonte des difficultés avec les workflows multi-approbateurs. Certaines lenteurs de chargement.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Revue Pasqal</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-12</span>
+</div>
+</div>
+<div class="call-summary">Globalement positif mais quelques points d'attention sur la complexité des workflows.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Pasqal</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-02-08</span>
+</div>
+</div>
+<div class="call-summary">Bonne satisfaction. Le client envisage d'étendre l'usage.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('10433846553')" data-score="1" data-segment="Small Account" data-name="inside">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/10433846553" target="_blank" class="link" onclick="event.stopPropagation()">Inside</a></td>
+<td>Small Account</td>
+<td><span class="score-badge score-1">1</span></td>
+<td><span class="trend trend-down">↓</span></td>
+<td><span class="sentiment-négatif">Négatif</span></td>
+<td>2026-04-12</td>
+<td><span class="pill pill-problem">Bugs bloquants sur la signature</span> <span class="pill pill-problem">Support non réactif</span> <span class="pill pill-problem">Perte de documents signalée</span></td>
+<td><span class="pill pill-feature">Fiabilité signature</span> <span class="pill pill-feature">Sauvegarde automatique</span></td>
+</tr>
+<tr class="detail-row" id="detail-10433846553">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 4 derniers appels — Inside</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Escalade Inside</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-04-12</span>
+</div>
+</div>
+<div class="call-summary">Situation critique. Le client a perdu un document important. Bug bloquant sur la signature. Menace de résiliation.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point Inside</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-03-20</span>
+</div>
+</div>
+<div class="call-summary">Client très frustré. Multiples bugs remontés sans résolution. Le support est jugé trop lent.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi Inside</span>
+<div>
+<span class="call-sentiment" style="background:#e71d36;color:#fff">Négatif</span>
+<span class="call-date">2026-02-25</span>
+</div>
+</div>
+<div class="call-summary">Problèmes de fiabilité persistants. Le client perd confiance.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Check-in Inside</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-01-18</span>
+</div>
+</div>
+<div class="call-summary">Premiers signaux de mécontentement. Le client remonte quelques bugs.</div>
+</div>
+
+</div>
+</td>
+</tr>
+<tr class="clickable" onclick="toggleDetail('10256489519')" data-score="3" data-segment="Enterprise" data-name="mf brands group">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/10256489519" target="_blank" class="link" onclick="event.stopPropagation()">MF BRANDS GROUP</a></td>
+<td>Enterprise</td>
+<td><span class="score-badge score-3">3</span></td>
+<td><span class="trend trend-up">↑</span></td>
+<td><span class="sentiment-positif">Positif</span></td>
+<td>2026-04-05</td>
+<td><span class="no-data">—</span></td>
+<td><span class="pill pill-feature">Connecteur ERP</span></td>
+</tr>
+<tr class="detail-row" id="detail-10256489519">
+<td colspan="8">
+<div class="detail-content">
+<h4>Détail des 3 derniers appels — MF BRANDS GROUP</h4>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Revue MF BRANDS GROUP</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-04-05</span>
+</div>
+</div>
+<div class="call-summary">Excellent bilan. Le client est très satisfait et envisage d'intégrer Tomorro avec leur ERP.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Point MF BRANDS GROUP</span>
+<div>
+<span class="call-sentiment" style="background:#2ec4b6;color:#1a1a2e">Positif</span>
+<span class="call-date">2026-03-10</span>
+</div>
+</div>
+<div class="call-summary">Adoption massive dans le groupe. Feedback très positif des différentes marques.</div>
+</div>
+<div class="call-card">
+<div class="call-header">
+<span class="call-title">Suivi MF BRANDS GROUP</span>
+<div>
+<span class="call-sentiment" style="background:#ff9f1c;color:#1a1a2e">Neutre</span>
+<span class="call-date">2026-02-05</span>
+</div>
+</div>
+<div class="call-summary">Bonne progression. Le client pose des questions sur les intégrations futures.</div>
+</div>
+
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+<footer>Tomorro Customer Sentiment Dashboard · Données HubSpot × Modjo · Analyse automatique</footer>
+</div>
+
+<script>
+function toggleDetail(id) {
+    const row = document.getElementById('detail-' + id);
+    if (row) row.style.display = row.style.display === 'table-row' ? 'none' : 'table-row';
+}
+
+function filterTable() {
+    const search = document.getElementById('search').value.toLowerCase();
+    const scoreFilter = document.getElementById('filterScore').value;
+    const segmentFilter = document.getElementById('filterSegment').value;
+    const rows = document.querySelectorAll('#mainTable tbody tr.clickable');
+    rows.forEach(row => {
+        const name = row.dataset.name;
+        const score = row.dataset.score;
+        const segment = row.dataset.segment;
+        const matchSearch = name.includes(search);
+        const matchScore = scoreFilter === 'all' || score === scoreFilter;
+        const matchSegment = segmentFilter === 'all' || segment === segmentFilter;
+        row.style.display = (matchSearch && matchScore && matchSegment) ? '' : 'none';
+        // Hide detail too
+        const detailId = row.querySelector('a') ? row.querySelector('a').href.split('/').pop() : '';
+    });
+}
+
+let sortDir = {};
+function sortTable(col) {
+    const table = document.getElementById('mainTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr.clickable'));
+    const details = {};
+    rows.forEach(r => {
+        const next = r.nextElementSibling;
+        if (next && next.classList.contains('detail-row')) details[r.dataset.name] = next;
+    });
+    sortDir[col] = !sortDir[col];
+    rows.sort((a, b) => {
+        let va = a.cells[col].textContent.trim();
+        let vb = b.cells[col].textContent.trim();
+        if (col === 2) { va = va === 'N/A' ? -1 : parseInt(va); vb = vb === 'N/A' ? -1 : parseInt(vb); }
+        if (col === 5) { va = va === '—' ? '0000-00-00' : va; vb = vb === '—' ? '0000-00-00' : vb; }
+        if (typeof va === 'number') return sortDir[col] ? va - vb : vb - va;
+        return sortDir[col] ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+    rows.forEach(r => {
+        tbody.appendChild(r);
+        if (details[r.dataset.name]) tbody.appendChild(details[r.dataset.name]);
+    });
+}
+
+function exportCSV() {
+    const rows = document.querySelectorAll('#mainTable tbody tr.clickable');
+    let csv = 'Client,Segment,Score,Tendance,Sentiment,Dernier appel,Problèmes,Demandes features\n';
+    rows.forEach(r => {
+        if (r.style.display === 'none') return;
+        const cells = r.querySelectorAll('td');
+        const line = [
+            cells[0].textContent.trim(),
+            cells[1].textContent.trim(),
+            cells[2].textContent.trim(),
+            cells[3].textContent.trim(),
+            cells[4].textContent.trim(),
+            cells[5].textContent.trim(),
+            '"' + cells[6].textContent.trim().replace(/\s+/g, ' ') + '"',
+            '"' + cells[7].textContent.trim().replace(/\s+/g, ' ') + '"'
+        ];
+        csv += line.join(',') + '\n';
+    });
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'customer_sentiment.csv'; a.click();
+}
+</script>
+</body>
+</html>
