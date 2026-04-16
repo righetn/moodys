@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { Fragment, useCallback, useMemo, useState } from "react"
-import { Download, Search } from "lucide-react"
+import {Fragment, useCallback, useMemo, useState} from "react";
+import {Download, Search} from "lucide-react";
 
-import { DashboardSidebarStats } from "@/components/sentiment/dashboard-sidebar-stats"
-import { useDashboard } from "@/components/sentiment/dashboard-context"
-import { SentimentKpiGrid } from "@/components/sentiment/sentiment-kpi-grid"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import {DashboardSidebarStats} from "@/components/sentiment/dashboard-sidebar-stats";
+import {useDashboard} from "@/components/sentiment/dashboard-context";
+import {SentimentKpiGrid} from "@/components/sentiment/sentiment-kpi-grid";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -24,59 +24,59 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { escapeCsvField } from "@/lib/csv-escape"
-import { DASHBOARD_META } from "@/lib/dashboard-meta"
-import { cn } from "@/lib/utils"
-import type { DashboardClient } from "@/types/dashboard"
+} from "@/components/ui/table";
+import {escapeCsvField} from "@/lib/csv-escape";
+import {DASHBOARD_META} from "@/lib/dashboard-meta";
+import {cn} from "@/lib/utils";
+import type {DashboardClient} from "@/types/dashboard";
 
 /** Sort: client name | mood (score) | last call */
-type SortCol = 0 | 1 | 2
+type SortCol = 0 | 1 | 2;
 
 function moodEmoji(score: number | null) {
-  if (score === 3) return "😊"
-  if (score === 2) return "😐"
-  if (score === 1) return "😟"
-  return "❓"
+  if (score === 3) return "😊";
+  if (score === 2) return "😐";
+  if (score === 1) return "😟";
+  return "❓";
 }
 
 function moodBadgeClass(score: number | null) {
   if (score === null)
-    return "gap-0.5 rounded-full border-0 bg-muted px-3 py-1.5 text-base text-muted-foreground"
+    return "gap-0.5 rounded-full border-0 bg-muted px-3 py-1.5 text-base text-muted-foreground";
   if (score === 3)
-    return "gap-1 rounded-full border-0 bg-primary/15 px-3 py-1.5 text-base font-bold text-primary"
+    return "gap-1 rounded-full border-0 bg-primary/15 px-3 py-1.5 text-base font-bold text-primary";
   if (score === 2)
-    return "gap-1 rounded-full border-0 bg-chart-3/15 px-3 py-1.5 text-base font-bold text-chart-3"
-  return "gap-1 rounded-full border-0 bg-destructive/15 px-3 py-1.5 text-base font-bold text-destructive"
+    return "gap-1 rounded-full border-0 bg-chart-3/15 px-3 py-1.5 text-base font-bold text-chart-3";
+  return "gap-1 rounded-full border-0 bg-destructive/15 px-3 py-1.5 text-base font-bold text-destructive";
 }
 
 function callSentimentBadgeClass(sentiment: string) {
-  const s = sentiment.toLowerCase()
+  const s = sentiment.toLowerCase();
   if (s.includes("négatif") || s.includes("negatif") || s.includes("negative"))
-    return "bg-destructive text-primary-foreground"
+    return "bg-destructive text-primary-foreground";
   if (s.includes("neutre") || s.includes("neutral"))
-    return "bg-chart-3/20 text-foreground"
+    return "bg-chart-3/20 text-foreground";
   if (s.includes("positif") || s.includes("positive"))
-    return "bg-primary/20 text-primary"
-  return "bg-muted text-muted-foreground"
+    return "bg-primary/20 text-primary";
+  return "bg-muted text-muted-foreground";
 }
 
 function rowScoreBorder(score: number | null) {
-  if (score === 3) return "border-l-primary"
-  if (score === 2) return "border-l-chart-3"
-  if (score === 1) return "border-l-destructive"
-  return "border-l-muted-foreground/50"
+  if (score === 3) return "border-l-primary";
+  if (score === 2) return "border-l-chart-3";
+  if (score === 1) return "border-l-destructive";
+  return "border-l-muted-foreground/50";
 }
 
 function formatShortDate(iso: string | null): string {
-  if (!iso) return "—"
-  const d = new Date(`${iso}T12:00:00`)
-  if (Number.isNaN(d.getTime())) return iso
+  if (!iso) return "—";
+  const d = new Date(`${iso}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return iso;
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "2-digit",
     year: "2-digit",
-  }).format(d)
+  }).format(d);
 }
 
 function compareClients(
@@ -85,29 +85,29 @@ function compareClients(
   col: SortCol,
   asc: boolean,
 ): number {
-  const dir = asc ? 1 : -1
+  const dir = asc ? 1 : -1;
   if (col === 0) {
-    return dir * a.displayName.localeCompare(b.displayName, "en")
+    return dir * a.displayName.localeCompare(b.displayName, "en");
   }
   if (col === 1) {
-    const va = a.score === null ? -1 : a.score
-    const vb = b.score === null ? -1 : b.score
-    return dir * (va - vb)
+    const va = a.score === null ? -1 : a.score;
+    const vb = b.score === null ? -1 : b.score;
+    return dir * (va - vb);
   }
   if (col === 2) {
-    const va = a.lastCall ?? "0000-00-00"
-    const vb = b.lastCall ?? "0000-00-00"
-    return dir * va.localeCompare(vb)
+    const va = a.lastCall ?? "0000-00-00";
+    const vb = b.lastCall ?? "0000-00-00";
+    return dir * va.localeCompare(vb);
   }
-  return 0
+  return 0;
 }
 
 function ariaSortState(
-  sort: { col: SortCol; asc: boolean } | null,
+  sort: {col: SortCol; asc: boolean} | null,
   col: SortCol,
 ): "ascending" | "descending" | "none" {
-  if (!sort || sort.col !== col) return "none"
-  return sort.asc ? "ascending" : "descending"
+  if (!sort || sort.col !== col) return "none";
+  return sort.asc ? "ascending" : "descending";
 }
 
 export function SentimentDashboard() {
@@ -124,9 +124,9 @@ export function SentimentDashboard() {
     setCsmFilter,
     segmentOptions,
     csmOptions,
-  } = useDashboard()
-  const [sort, setSort] = useState<{ col: SortCol; asc: boolean } | null>(null)
-  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  } = useDashboard();
+  const [sort, setSort] = useState<{col: SortCol; asc: boolean} | null>(null);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const todayLabel = useMemo(
     () =>
@@ -136,77 +136,77 @@ export function SentimentDashboard() {
         year: "2-digit",
       }).format(new Date()),
     [],
-  )
+  );
 
   const toggleExpanded = useCallback((id: string) => {
     setExpanded((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }, [])
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
+    const q = search.trim().toLowerCase();
     return clients.filter((c) => {
       const matchSearch =
         !q ||
         c.searchName.toLowerCase().includes(q) ||
-        c.displayName.toLowerCase().includes(q)
-      const matchScore =
-        scoreFilter === "all" || c.scoreFilter === scoreFilter
+        c.displayName.toLowerCase().includes(q);
+      const matchScore = scoreFilter === "all" || c.scoreFilter === scoreFilter;
       const matchSegment =
-        segmentFilter === "all" || c.segment === segmentFilter
-      const csmTrim = c.csm?.trim() ?? ""
+        segmentFilter === "all" || c.segment === segmentFilter;
+      const csmTrim = c.csm?.trim() ?? "";
       const matchCsm =
         csmFilter === "all" ||
         (csmFilter === "__unassigned__" && !csmTrim) ||
         (csmFilter !== "all" &&
           csmFilter !== "__unassigned__" &&
-          csmTrim === csmFilter)
-      return matchSearch && matchScore && matchSegment && matchCsm
-    })
-  }, [clients, search, scoreFilter, segmentFilter, csmFilter])
+          csmTrim === csmFilter);
+      return matchSearch && matchScore && matchSegment && matchCsm;
+    });
+  }, [clients, search, scoreFilter, segmentFilter, csmFilter]);
 
   const visibleClients = useMemo(() => {
-    if (!sort) return filtered
-    const { col, asc } = sort
+    if (!sort) return filtered;
+    const {col, asc} = sort;
     return [...filtered].sort((a, b) => {
-      const primary = compareClients(a, b, col, asc)
-      if (primary !== 0) return primary
-      return a.id.localeCompare(b.id)
-    })
-  }, [filtered, sort])
+      const primary = compareClients(a, b, col, asc);
+      if (primary !== 0) return primary;
+      return a.id.localeCompare(b.id);
+    });
+  }, [filtered, sort]);
 
   const requestSort = (col: SortCol) => {
     setSort((prev) => {
-      if (prev?.col === col) return { col, asc: !prev.asc }
-      return { col, asc: true }
-    })
-  }
+      if (prev?.col === col) return {col, asc: !prev.asc};
+      return {col, asc: true};
+    });
+  };
 
   const resetFilters = useCallback(() => {
-    setSearch("")
-    setScoreFilter("all")
-    setSegmentFilter("all")
-    setCsmFilter("all")
-  }, [setSearch, setScoreFilter, setSegmentFilter, setCsmFilter])
+    setSearch("");
+    setScoreFilter("all");
+    setSegmentFilter("all");
+    setCsmFilter("all");
+  }, [setSearch, setScoreFilter, setSegmentFilter, setCsmFilter]);
 
   const filtersActive =
     search.trim() !== "" ||
     scoreFilter !== "all" ||
     segmentFilter !== "all" ||
-    csmFilter !== "all"
+    csmFilter !== "all";
 
   const exportCsv = useCallback(() => {
-    const header = "Client,Mood score,Last call,Key issues,Feature requests,CSM\n"
+    const header =
+      "Client,Mood score,Last call,Key issues,Feature requests,CSM\n";
     const lines = visibleClients.map((c) => {
-      const mood = c.score === null ? "?" : String(c.score)
-      const last = c.lastCall ?? "—"
-      const problems = c.problems.join(" ").replace(/\s+/g, " ").trim() || "—"
-      const features = c.features.join(" ").replace(/\s+/g, " ").trim() || "—"
-      const csm = c.csm?.trim() || "—"
+      const mood = c.score === null ? "?" : String(c.score);
+      const last = c.lastCall ?? "—";
+      const problems = c.problems.join(" ").replace(/\s+/g, " ").trim() || "—";
+      const features = c.features.join(" ").replace(/\s+/g, " ").trim() || "—";
+      const csm = c.csm?.trim() || "—";
       return [
         escapeCsvField(c.displayName),
         escapeCsvField(mood),
@@ -214,17 +214,17 @@ export function SentimentDashboard() {
         escapeCsvField(problems),
         escapeCsvField(features),
         escapeCsvField(csm),
-      ].join(",")
-    })
-    const csv = "\uFEFF" + header + lines.join("\n")
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "customer_sentiment.csv"
-    a.click()
-    URL.revokeObjectURL(url)
-  }, [visibleClients])
+      ].join(",");
+    });
+    const csv = "\uFEFF" + header + lines.join("\n");
+    const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "customer_sentiment.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [visibleClients]);
 
   return (
     <div className="min-h-screen bg-muted/40 text-foreground antialiased">
@@ -254,7 +254,9 @@ export function SentimentDashboard() {
             <p className="text-sm font-medium text-foreground">
               {clients.length} active clients · {todayLabel}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">{DASHBOARD_META.subtitle}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {DASHBOARD_META.subtitle}
+            </p>
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 sm:ml-auto">
@@ -262,14 +264,20 @@ export function SentimentDashboard() {
               variant="outline"
               className="gap-1.5 rounded-full border-border bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground"
             >
-              <span className="size-1.5 shrink-0 rounded-full bg-orange-500" aria-hidden />
+              <span
+                className="size-1.5 shrink-0 rounded-full bg-orange-500"
+                aria-hidden
+              />
               HubSpot
             </Badge>
             <Badge
               variant="outline"
               className="gap-1.5 rounded-full border-border bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground"
             >
-              <span className="size-1.5 shrink-0 rounded-full bg-violet-600" aria-hidden />
+              <span
+                className="size-1.5 shrink-0 rounded-full bg-violet-600"
+                aria-hidden
+              />
               Modjo
             </Badge>
           </div>
@@ -340,13 +348,15 @@ export function SentimentDashboard() {
               {search.trim() ? (
                 <>
                   {" "}
-                  · search « <strong className="text-foreground">{search.trim()}</strong> »
+                  · search «{" "}
+                  <strong className="text-foreground">{search.trim()}</strong> »
                 </>
               ) : null}
               {scoreFilter !== "all" ? (
                 <>
                   {" "}
-                  · mood <strong className="text-foreground">{scoreFilter}</strong>
+                  · mood{" "}
+                  <strong className="text-foreground">{scoreFilter}</strong>
                 </>
               ) : null}
               {segmentFilter !== "all" ? (
@@ -465,7 +475,9 @@ export function SentimentDashboard() {
                         </TableCell>
                         <TableCell className="max-w-[220px] border-t border-border px-4 py-3 whitespace-normal">
                           {c.problems.length === 0 ? (
-                            <span className="text-muted-foreground italic">—</span>
+                            <span className="text-muted-foreground italic">
+                              —
+                            </span>
                           ) : (
                             <span className="flex flex-wrap gap-1">
                               {c.problems.map((p) => (
@@ -482,7 +494,9 @@ export function SentimentDashboard() {
                         </TableCell>
                         <TableCell className="max-w-[220px] border-t border-border px-4 py-3 whitespace-normal">
                           {c.features.length === 0 ? (
-                            <span className="text-muted-foreground italic">—</span>
+                            <span className="text-muted-foreground italic">
+                              —
+                            </span>
                           ) : (
                             <span className="flex flex-wrap gap-1">
                               {c.features.map((f) => (
@@ -588,7 +602,8 @@ export function SentimentDashboard() {
                                               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                                 <span
                                                   className={
-                                                    email.direction === "inbound"
+                                                    email.direction ===
+                                                    "inbound"
                                                       ? "font-medium text-foreground"
                                                       : "font-medium text-foreground"
                                                   }
@@ -614,7 +629,9 @@ export function SentimentDashboard() {
                                                   target="_blank"
                                                   rel="noopener noreferrer"
                                                   className="font-medium text-primary hover:underline"
-                                                  onClick={(e) => e.stopPropagation()}
+                                                  onClick={(e) =>
+                                                    e.stopPropagation()
+                                                  }
                                                 >
                                                   HubSpot ↗
                                                 </a>
@@ -648,5 +665,5 @@ export function SentimentDashboard() {
         </footer>
       </div>
     </div>
-  )
+  );
 }

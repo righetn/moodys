@@ -1,11 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import type { DashboardKpi } from "@/types/dashboard"
+import {Card, CardContent, CardFooter, CardHeader} from "@/components/ui/card";
+import {cn} from "@/lib/utils";
+import type {DashboardKpi} from "@/types/dashboard";
 
 const toneValueClass: Record<string, string> = {
   excellent: "text-primary",
@@ -13,7 +8,7 @@ const toneValueClass: Record<string, string> = {
   alert: "text-destructive",
   avg: "text-chart-2",
   nodata: "text-muted-foreground",
-}
+};
 
 const toneEmoji: Record<string, string> = {
   excellent: "😊",
@@ -21,7 +16,7 @@ const toneEmoji: Record<string, string> = {
   alert: "😟",
   avg: "📊",
   nodata: "❓",
-}
+};
 
 /** Maps KPI tone to `scoreFilter` value; `avg` is not filterable. */
 const toneToScoreFilter: Record<string, string | null> = {
@@ -30,7 +25,7 @@ const toneToScoreFilter: Record<string, string | null> = {
   alert: "1",
   nodata: "na",
   avg: null,
-}
+};
 
 const toneTopBorder: Record<string, string> = {
   excellent: "border-t-primary",
@@ -38,13 +33,13 @@ const toneTopBorder: Record<string, string> = {
   alert: "border-t-destructive",
   avg: "border-t-chart-2",
   nodata: "border-t-muted-foreground/60",
-}
+};
 
 type SentimentKpiGridProps = {
-  kpis: DashboardKpi[]
-  scoreFilter: string
-  onScoreFilter: (value: string) => void
-}
+  kpis: DashboardKpi[];
+  scoreFilter: string;
+  onScoreFilter: (value: string) => void;
+};
 
 export function SentimentKpiGrid({
   kpis,
@@ -54,9 +49,9 @@ export function SentimentKpiGrid({
   return (
     <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-2.5">
       {kpis.map((kpi) => {
-        const filterValue = toneToScoreFilter[kpi.tone]
-        const isClickable = filterValue !== null
-        const isActive = isClickable && scoreFilter === filterValue
+        const filterValue = toneToScoreFilter[kpi.tone];
+        const isClickable = filterValue !== null;
+        const isActive = isClickable && scoreFilter === filterValue;
 
         return (
           <Card
@@ -76,10 +71,10 @@ export function SentimentKpiGrid({
               isClickable
                 ? (e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault()
+                      e.preventDefault();
                       onScoreFilter(
                         scoreFilter === filterValue ? "all" : filterValue,
-                      )
+                      );
                     }
                   }
                 : undefined
@@ -112,11 +107,13 @@ export function SentimentKpiGrid({
               </p>
             </CardContent>
             <CardFooter className="justify-center border-t-0 bg-transparent px-3 pt-0 pb-0">
-              <p className="text-[10px] text-muted-foreground">{kpi.sublabel}</p>
+              <p className="text-[10px] text-muted-foreground">
+                {kpi.sublabel}
+              </p>
             </CardFooter>
           </Card>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

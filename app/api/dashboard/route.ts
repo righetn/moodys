@@ -2,9 +2,9 @@ import { NextResponse } from "next/server"
 
 import { isProductionApi } from "@/lib/api-env"
 import {
+  checkDashboardReadAuth,
   DASHBOARD_TOKEN_HEADER,
   getBearerToken,
-  verifyDashboardReadRequest,
   verifyDashboardUpdateToken,
 } from "@/lib/dashboard-update-auth"
 import {
@@ -26,12 +26,26 @@ const MAX_PUT_BODY_BYTES = 2 * 1024 * 1024
 
 /**
  * GET /api/dashboard — `{ clients, kpis }` (kpis dérivés des scores en base).
- * Si `DASHBOARD_READ_TOKEN` est défini, exige `Authorization: Bearer …` ou `x-dashboard-token`.
+ *
+ * Auth obligatoire : `Authorization: Bearer <token>` ou `x-dashboard-token`, où `<token>`
+ * doit correspondre à `DASHBOARD_READ_TOKEN` et/ou `DASHBOARD_UPDATE_TOKEN` (au moins un
+ * des deux doit être configuré sur le serveur, sinon **503**).
  */
 export async function GET(request: Request) {
-  if (!verifyDashboardReadRequest(request)) {
+  const auth = checkDashboardReadAuth(request)
+  if (!auth.ok) {
+    if (auth.reason === "misconfigured") {
+      return NextResponse.json(
+        {
+          error:
+            "Server misconfiguration: set DASHBOARD_READ_TOKEN and/or DASHBOARD_UPDATE_TOKEN for GET.",
+          code: "DASHBOARD_READ_AUTH_NOT_CONFIGURED",
+        },
+        { status: 503, headers: SENSITIVE_CACHE_HEADERS },
+      )
+    }
     return NextResponse.json(
-      { error: "Unauthorized" },
+      { error: "Unauthorized", code: "DASHBOARD_READ_UNAUTHORIZED" },
       { status: 401, headers: SENSITIVE_CACHE_HEADERS },
     )
   }

@@ -18,8 +18,9 @@ async function main() {
     )
   }
   const sql = neon(url)
-  await sql`TRUNCATE TABLE score RESTART IDENTITY`
-  await sql`TRUNCATE TABLE organization`
+  // Une seule commande : Postgres refuse TRUNCATE sur `organization` dans un
+  // appel séparé tant que `score` référence cette table (même vide).
+  await sql`TRUNCATE TABLE score, organization RESTART IDENTITY`
   console.log("Tables `score` et `organization` ont été vidées.")
 }
 
