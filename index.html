@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moody's — Customer Mood Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --green:#22c55e;--green-bg:#f0fdf4;--green-dim:#dcfce7;
+      --amber:#f59e0b;--amber-bg:#fffbeb;--amber-dim:#fef3c7;
+      --red:#ef4444;--red-bg:#fef2f2;--red-dim:#fee2e2;
+      --gray:#94a3b8;--gray-bg:#f8fafc;--gray-dim:#f1f5f9;
+      --blue:#3b82f6;--ink:#0f172a;--ink2:#334155;--muted:#64748b;
+      --border:#e2e8f0;--bg:#f1f5f9;--card:#ffffff;
+      --radius:12px;--shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+      --shadow-hover:0 4px 12px rgba(0,0,0,.1),0 12px 32px rgba(0,0,0,.06);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+    a{color:inherit;text-decoration:none}
+    .pw{max-width:1480px;margin:0 auto;padding:0 28px 40px}
+    .hdr{display:flex;align-items:center;gap:16px;padding:18px 0 16px;margin-bottom:20px;border-bottom:1px solid var(--border)}
+    .hdr-logo img{height:48px;width:auto;display:block}
+    .hdr-sep{width:1px;height:30px;background:var(--border);flex-shrink:0}
+    .hdr-text{flex:1}
+    .hdr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+    .kpi-card{background:var(--card);border-radius:var(--radius);padding:16px 18px;border:1.5px solid var(--border);cursor:pointer;transition:border-color .18s,box-shadow .18s,transform .15s;position:relative;overflow:hidden}
+    .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);transition:background .18s}
+    .kpi-card.excellent::before{background:var(--green)}.kpi-card.neutre::before{background:var(--amber)}
+    .kpi-card.alert::before{background:var(--red)}.kpi-card.avg::before{background:var(--blue)}.kpi-card.nodata::before{background:var(--gray)}
+    .kpi-card:hover{border-color:#cbd5e1;box-shadow:var(--shadow-hover);transform:translateY(-1px)}
+    .kpi-card.filter-active{border-color:var(--ink)!important;box-shadow:0 0 0 3px rgba(15,23,42,.1)}
+    .kpi-card.filter-active.excellent{border-color:var(--green)!important;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+    .kpi-card.filter-active.neutre{border-color:var(--amber)!important;box-shadow:0 0 0 3px rgba(245,158,11,.15)}
+    .kpi-card.filter-active.alert{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(239,68,68,.15)}
+    .kpi-emoji{font-size:22px;margin-bottom:6px}
+    .kpi-value{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1;margin-bottom:4px}
+    .kpi-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+    .kpi-hint{font-size:10px;color:var(--gray);margin-top:3px}
+    .kpi-card.excellent .kpi-value{color:#16a34a}.kpi-card.neutre .kpi-value{color:#d97706}
+    .kpi-card.alert .kpi-value{color:#dc2626}.kpi-card.avg .kpi-value{color:var(--blue)}.kpi-card.nodata .kpi-value{color:var(--gray)}
+    .controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+    .controls input{background:var(--card);border:1.5px solid var(--border);color:var(--ink);padding:8px 14px;border-radius:8px;font-size:12px;flex:1;min-width:180px;font-family:inherit;transition:border-color .15s,box-shadow .15s}
+    .controls input:focus{outline:none;border-color:#94a3b8;box-shadow:0 0 0 3px rgba(148,163,184,.2)}
+    .controls input::placeholder{color:#94a3b8}
+    .controls select{background:var(--card);border:1.5px solid var(--border);color:var(--ink);padding:8px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;min-width:140px}
+    .controls button{background:var(--ink);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:background .15s,transform .1s}
+    .controls button:hover{background:#1e293b;transform:translateY(-1px)}
+    .filter-indicator{font-size:11px;color:var(--muted);margin-bottom:10px}
+    .filter-indicator strong{color:var(--ink)}
+    .page-body{display:grid;grid-template-columns:1fr 272px;gap:18px;align-items:start}
+    @media(max-width:1100px){.page-body{grid-template-columns:1fr}.page-sidebar{position:static}}
+    .tbl-wrap{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow)}
+    table{width:100%;border-collapse:collapse}
+    thead{background:#f8fafc}
+    th{padding:11px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1px solid var(--border);transition:color .15s}
+    th:hover{color:var(--ink)}
+    td{padding:13px 14px;border-top:1px solid #f1f5f9;font-size:12.5px;vertical-align:middle}
+    tr.clickable{cursor:pointer;transition:background .15s;border-left:3px solid transparent}
+    tr.clickable:hover{background:#f8fafc}
+    tr.clickable[data-score="3"]{border-left-color:var(--green)}
+    tr.clickable[data-score="2"]{border-left-color:var(--amber)}
+    tr.clickable[data-score="1"]{border-left-color:var(--red)}
+    tr.clickable.open{background:#f8fafc}
+    .score-badge{display:inline-flex;align-items:center;justify-content:center;padding:3px 12px;border-radius:20px;font-weight:700;font-size:12px;min-width:36px}
+    .score-3{background:var(--green-dim);color:#15803d}.score-2{background:var(--amber-dim);color:#b45309}.score-1{background:var(--red-dim);color:#b91c1c}.score-na{background:var(--gray-dim);color:var(--gray)}
+    .pill{display:inline-block;padding:2px 9px;border-radius:8px;font-size:11px;font-weight:500;margin:2px 3px 2px 0}
+    .pill-problem{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+    .pill-feature{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
+    .no-data{color:#94a3b8;font-style:italic;font-size:12px}
+    .client-link{color:var(--ink2);font-weight:600;font-size:13px;transition:color .15s}
+    .client-link:hover{color:var(--blue)}
+    .detail-row{display:none}
+    .detail-row td{padding:0;border-top:2px solid var(--border)}
+    .detail-content{padding:20px 22px;background:#fafbfc}
+    .detail-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media(max-width:900px){.detail-cols{grid-template-columns:1fr}}
+    .detail-section h4{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .detail-section h4::after{content:'';flex:1;height:1px;background:var(--border)}
+    .detail-row.open{display:table-row!important}
+    .detail-content{animation:slideDown .2s ease-out}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+    .call-card{background:var(--card);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1px solid var(--border);border-left:3px solid var(--blue);box-shadow:0 1px 3px rgba(0,0,0,.04);transition:box-shadow .15s,transform .15s}
+    .call-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-1px)}
+    .call-card.sent-pos{border-left-color:var(--green)}.call-card.sent-neu{border-left-color:var(--amber)}.call-card.sent-neg{border-left-color:var(--red)}
+    .call-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+    .call-title{font-weight:600;color:var(--ink);font-size:12px;flex:1;line-height:1.4}
+    .call-meta{display:flex;gap:6px;align-items:center;flex-shrink:0}
+    .call-date{color:var(--muted);font-size:10px;white-space:nowrap}
+    .call-summary{color:var(--ink2);font-size:11.5px;line-height:1.6}
+    .email-card{background:var(--card);border-radius:10px;padding:10px 13px;margin-bottom:8px;border:1px solid var(--border);border-left:3px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+    .email-card.incoming{border-left-color:var(--blue)}.email-card.outgoing{border-left-color:#94a3b8}
+    .email-subject{font-weight:600;color:var(--ink);font-size:12px;margin-bottom:5px;line-height:1.4}
+    .email-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .dir-in{background:#eff6ff;color:#1d4ed8;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600}
+    .dir-out{background:#f1f5f9;color:#475569;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600}
+    .email-sender{color:var(--muted);font-size:10.5px}
+    .email-date{color:#94a3b8;font-size:10.5px}
+    .sent-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap}
+    .sent-pos{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+    .sent-neu{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+    .sent-neg{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+    .src-link{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#7c3aed;text-decoration:none;padding:1px 7px;border-radius:6px;background:#f5f3ff;border:1px solid #e9d5ff;transition:background .15s,color .15s;white-space:nowrap;flex-shrink:0}
+    .src-link:hover{background:#ede9fe;color:#5b21b6}
+    .empty-state{display:flex;align-items:center;gap:10px;background:#f8fafc;border-radius:10px;padding:12px 16px;border:1.5px dashed var(--border);color:var(--muted);font-size:12px;font-style:italic}
+    .empty-state::before{content:"—";font-size:16px;color:#cbd5e1;flex-shrink:0}
+    .usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+    .usage-item{background:var(--card);border-radius:8px;padding:12px 14px;border:1px solid var(--border)}
+    .usage-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+    .usage-value{font-size:12.5px;color:var(--ink2);line-height:1.5}
+    .page-sidebar{position:sticky;top:20px;display:flex;flex-direction:column;gap:14px}
+    .sidebar-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:16px 18px;box-shadow:var(--shadow)}
+    .sidebar-card-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px}
+    .sidebar-card-sub{font-size:10px;color:#94a3b8;margin-bottom:14px}
+    footer{text-align:center;padding:24px 0 10px;color:#94a3b8;font-size:10.5px;border-top:1px solid var(--border);margin-top:28px}
+
+    /* Logo + KPI cards on same line */
+    .hdr .kpi-grid{display:flex;gap:8px;flex:1;margin-bottom:0;grid-template-columns:unset}
+    .hdr .kpi-card{padding:10px 14px;flex:1;min-width:80px}
+    .hdr .kpi-emoji{font-size:16px;margin-bottom:2px}
+    .hdr .kpi-value{font-size:22px;letter-spacing:-.5px}
+    .hdr .kpi-label{font-size:9px}
+    .hdr .kpi-hint{display:none}
+  </style>
+</head>
+<body>
+<div class="pw">
+
+  <!-- HEADER + KPIs -->
+  <header class="hdr">
+    <div class="hdr-logo">
+      <img src="moodys.png" alt="Moody's" onerror="this.style.display='none'">
+    </div>
+    <div class="hdr-sep"></div>
+    <div class="kpi-grid">
+      <div class="kpi-card excellent" data-filter="3">
+        <div class="kpi-emoji">😊</div>
+        <div class="kpi-value" id="kpi3">4</div>
+        <div class="kpi-label">Excellent</div>
+        <div class="kpi-hint">score 3</div>
+      </div>
+      <div class="kpi-card neutre" data-filter="2">
+        <div class="kpi-emoji">😐</div>
+        <div class="kpi-value" id="kpi2">16</div>
+        <div class="kpi-label">Neutral</div>
+        <div class="kpi-hint">score 2</div>
+      </div>
+      <div class="kpi-card alert" data-filter="1">
+        <div class="kpi-emoji">🚨</div>
+        <div class="kpi-value" id="kpi1">0</div>
+        <div class="kpi-label">Alert</div>
+        <div class="kpi-hint">score 1</div>
+      </div>
+      <div class="kpi-card avg">
+        <div class="kpi-emoji">📊</div>
+        <div class="kpi-value">2.2</div>
+        <div class="kpi-label">Score moyen</div>
+        <div class="kpi-hint">sur 3</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍  Search a client…" oninput="applyFilters()">
+    <select id="csmFilter" onchange="applyFilters()"><option value="">All CSMs</option></select>
+    <select id="segFilter" onchange="applyFilters()"><option value="">All segments</option></select>
+    <button onclick="resetFilters()">✕ Reset</button>
+    <button onclick="exportExcel()">⬇ Export Excel</button>
+  </div>
+  <div class="filter-indicator" id="filterIndicator"></div>
+
+  <!-- BODY -->
+  <div class="page-body">
+    <div class="page-main">
+      <div class="tbl-wrap">
+        <table id="mainTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">Client ↕</th>
+              <th onclick="sortTable(1)">Score ↕</th>
+              <th onclick="sortTable(2)">Last call ↕</th>
+              <th onclick="sortTable(3)">CSM ↕</th>
+              <th>Key issues</th>
+              <th>Feature requests</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 1 — POLARISE  score:3
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="3" data-segment="Medium Account" data-csm="Hanane Boujarfaoui" data-date="2026-04-15" data-name="polarise" onclick="toggleDetail('polarise')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/41392015388" class="client-link" target="_blank" onclick="event.stopPropagation()">Polarise</a></td><td><span class="score-badge score-3">3</span></td><td>15/04/26</td>
+  <td>Hanane</td><td><span class="pill pill-problem">Mixed EN/FR emails</span></td><td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-polarise"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Suivi licences & restructuration</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">15/04/26</span>
+            <a href="https://app.modjo.ai/calls/189489" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Utilisateur très satisfait du fonctionnement de l'outil, aucune plainte. Discussion centrée sur la gestion des licences créateur et l'adaptation à la restructuration interne. Aucune demande fonctionnelle ni problème bloquant.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (40 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Acceptée : Invitation — Point de suivi Tomorro x Polarise</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-04-15</span></div>
+      </div>
+      <div class="email-card outgoing">
+        <div class="email-subject">Re: Point de suivi mensuel</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-04-10</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared (use_cases)</div><div class="usage-value">Not filled in</div></div>
+        <div class="usage-item"><div class="usage-label">Actual (tomorro_use_case)</div><div class="usage-value">Generation · Negotiation · Signature · Storage</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 2 — GL EVENTS RH  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Enterprise" data-csm="Marianne Dubuard" data-date="2026-01-13" data-name="gl events rh" onclick="toggleDetail('gl-events-rh')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34261862152" class="client-link" target="_blank" onclick="event.stopPropagation()">GL Events RH</a></td><td><span class="score-badge score-2">2</span></td><td>13/01/26</td>
+  <td>Marianne</td><td><span class="pill pill-problem">Dynamic tables issue</span><span class="pill pill-problem">GDPR employee files</span></td><td><span class="pill pill-feature">SAP Ariba integration</span><span class="pill pill-feature">Auto rights duplication</span></td>
+</tr>
+<tr class="detail-row" id="detail-gl-events-rh"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Présentation Add-in Word & use cases RH</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">13/01/26</span>
+            <a href="https://app.modjo.ai/calls/143822" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Add-in Word perçu comme une valeur ajoutée réelle pour les contrats externes. Limitations identifiées : intégration des clauses du closier Tomorro dans Word, duplication des droits utilisateurs. Intérêt pour l'intégration SAP Ariba.</div>
+      </div>
+      <div class="call-card sent-neu">
+        <div class="call-header">
+          <span class="call-title">Dématérialisation RH — blocages process</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-neu">Neutral</span>
+            <span class="call-date">09/01/26</span>
+            <a href="https://app.modjo.ai/calls/142757" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Frustration sur l'impossibilité de compléter les tableaux dynamiques côté co-contractant. Problèmes RGPD sur les téléchargements de justificatifs. Ton professionnel mais tensions sur certains points bloquants.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (9 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Problème d'approbateur et signataires</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Negative</span><span class="email-date">2026-01-15</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Incident résolu — mise à jour</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-01-10</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Storage · Negotiation · Signature</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Negotiation · Signature · Storage</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 3 — INFOPRO DIGITAL RH  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Strategic Account" data-csm="Laurie Pénélaud" data-date="2026-04-16" data-name="infopro digital rh" onclick="toggleDetail('infopro')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33695278612" class="client-link" target="_blank" onclick="event.stopPropagation()">Infopro Digital RH</a></td><td><span class="score-badge score-2">2</span></td><td><span class="no-data">No calls</span></td>
+  <td>Laurie</td><td><span class="no-data">—</span></td><td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-infopro"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="empty-state">No calls found for this account on Modjo.</div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (36 total)</h4>
+      <div class="email-card outgoing">
+        <div class="email-subject">Re: Questions fonctionnalités — génération de contrats</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-04-10</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Demande accès — nouveaux utilisateurs</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-03-28</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Storage · Signature</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Signature · Storage</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 4 — HABITATION BATIMENT  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Medium Account" data-csm="Laurie Pénélaud" data-date="2025-08-26" data-name="habitation batiment" onclick="toggleDetail('habitation')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/25976217869" class="client-link" target="_blank" onclick="event.stopPropagation()">Habitation Bâtiment</a></td><td><span class="score-badge score-2">2</span></td><td>26/08/25</td>
+  <td>Laurie</td><td><span class="pill pill-problem">Contract signing bug</span><span class="pill pill-problem">No bulk field editing</span></td><td><span class="pill pill-feature">Customizable email subject</span></td>
+</tr>
+<tr class="detail-row" id="detail-habitation"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Config champs & paramétrage signature</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">26/08/25</span>
+            <a href="https://app.modjo.ai/calls/114775" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Échange constructif et bienveillant. Quelques difficultés techniques sur la modification de champs en masse et la personnalisation des emails. Aide claire apportée, suivi individuel proposé. Ton global positif orienté résolution.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (20 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Bug lors de la signature d'un contrat</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Negative</span><span class="email-date">2026-02-14</span></div>
+      </div>
+      <div class="email-card outgoing">
+        <div class="email-subject">Re: Accès nouveaux utilisateurs</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-01-20</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Signature · Negotiation</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Signature · Storage</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 5 — RÉMY COINTREAU CEP  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Enterprise" data-csm="Marianne Dubuard" data-date="2025-12-16" data-name="rémy cointreau cep" onclick="toggleDetail('remy')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34259224328" class="client-link" target="_blank" onclick="event.stopPropagation()">Rémy Cointreau — CEP</a></td><td><span class="score-badge score-2">2</span></td><td>16/12/25</td>
+  <td>Marianne</td><td><span class="pill pill-problem">Blocking mandatory fields</span></td><td><span class="pill pill-feature">Truly optional fields</span><span class="pill pill-feature">Flexible conditions</span></td>
+</tr>
+<tr class="detail-row" id="detail-remy"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-neu">
+        <div class="call-header">
+          <span class="call-title">Déblocage champs facultatifs — modèle contrat</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-neu">Neutral</span>
+            <span class="call-date">16/12/25</span>
+            <a href="https://app.modjo.ai/calls/139777" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Stéphanie est bloquée sur des champs qui devraient être facultatifs mais empêchent l'envoi en signature. Solution temporaire trouvée (suppression manuelle), mais la cliente attend une adaptation plus flexible des modèles. Échange cordial et orienté service.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (25 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Re: Aide paramétrage modèle contrat commercial</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-01-08</span></div>
+      </div>
+      <div class="email-card outgoing">
+        <div class="email-subject">Tomorro &lt;&gt; CEP — Point de suivi Q4</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2025-12-10</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Signature <em style="color:var(--green);font-size:11px">↑ expansion</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 6 — GP EXPLORER  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Small Account" data-csm="Cassandra Mylle" data-date="" data-name="gp explorer" onclick="toggleDetail('gp-explorer')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/42606417725" class="client-link" target="_blank" onclick="event.stopPropagation()">GP Explorer</a></td><td><span class="score-badge score-2">2</span></td><td><span class="no-data">No calls</span></td>
+  <td>Cassandra</td><td><span class="pill pill-problem">Unmeasured actual usage</span></td><td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-gp-explorer"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="empty-state">No calls found for this account on Modjo.</div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (3 total)</h4>
+      <div class="email-card outgoing">
+        <div class="email-subject">Mise en relation — programme ambassadeurs Tomorro</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-02-10</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Storage · Generation · Negotiation · Signature</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value" style="color:#dc2626">Not filled in ⚠ probable under-use</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 7 — CIUP  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Key Account" data-csm="Hanane Boujarfaoui" data-date="2026-04-09" data-name="ciup" onclick="toggleDetail('ciup')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/8901753006" class="client-link" target="_blank" onclick="event.stopPropagation()">CIUP</a></td><td><span class="score-badge score-2">2</span></td><td>09/04/26</td>
+  <td>Hanane</td><td><span class="pill pill-problem">Issue on Tomorro (today)</span><span class="pill pill-problem">No auto-archiving</span></td><td><span class="pill pill-feature">Auto-archiving</span><span class="pill pill-feature">Excel signing</span></td>
+</tr>
+<tr class="detail-row" id="detail-ciup"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Présentation nouveau CSM — bilan utilisation</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">09/04/26</span>
+            <a href="https://app.modjo.ai/calls/185066" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Utilisatrices enchantées de la solution — "solution fluide, facile à utiliser, très contentes". Échange constructif sur les besoins d'évolution : archivage automatique des contrats terminés et signature native des fichiers Excel. Relation client très positive.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (216 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Problème sur Tomorro</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Negative</span><span class="email-sender">client@ciup.fr</span><span class="email-date">2026-04-16</span></div>
+      </div>
+      <div class="email-card outgoing">
+        <div class="email-subject">Acceptée : Point de suivi mensuel CIUP</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-date">2026-04-05</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Storage · Negotiation · Generation · Signature</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Signature · Storage <em style="color:#d97706;font-size:11px">⚠ Negotiation manquant</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 8 — CHEERZ RH  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Small Account" data-csm="Cassandra Mylle" data-date="" data-name="cheerz rh" onclick="toggleDetail('cheerz')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/45987145386" class="client-link" target="_blank" onclick="event.stopPropagation()">Cheerz RH</a></td><td><span class="score-badge score-2">2</span></td><td><span class="no-data">No calls</span></td>
+  <td>Cassandra</td><td><span class="pill pill-problem">No engagement signal</span></td><td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-cheerz"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section"><h4>📞 Modjo calls</h4><div class="empty-state">No calls found for this account on Modjo.</div></div>
+    <div class="detail-section"><h4>📧 Recent emails</h4><div class="empty-state">No emails found in HubSpot for this account.</div></div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Not filled in</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Signature</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 9 — KALHYGE  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Small Account" data-csm="Margaux Chatel" data-date="" data-name="kalhyge" onclick="toggleDetail('kalhyge')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/35599744087" class="client-link" target="_blank" onclick="event.stopPropagation()">Kalhyge</a></td><td><span class="score-badge score-2">2</span></td><td><span class="no-data">No calls</span></td>
+  <td>Margaux</td><td><span class="pill pill-problem">Unmeasured actual usage</span></td><td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-kalhyge"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section"><h4>📞 Modjo calls</h4><div class="empty-state">No calls found for this account on Modjo.</div></div>
+    <div class="detail-section"><h4>📧 Recent emails</h4><div class="empty-state">No emails found in HubSpot for this account.</div></div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Storage</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value" style="color:#dc2626">Not filled in ⚠ probable under-use</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 10 — OZI SAS  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Medium Account" data-csm="Cassandra Mylle" data-date="" data-name="ozi sas" onclick="toggleDetail('ozi')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/40695694084" class="client-link" target="_blank" onclick="event.stopPropagation()">Ozi SAS</a></td><td><span class="score-badge score-2">2</span></td><td><span class="no-data">No calls</span></td>
+  <td>Cassandra</td><td><span class="pill pill-problem">Unmeasured storage</span></td><td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-ozi"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section"><h4>📞 Modjo calls</h4><div class="empty-state">No calls found for this account on Modjo.</div></div>
+    <div class="detail-section"><h4>📧 Recent emails</h4><div class="empty-state">No emails found in HubSpot for this account.</div></div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Signature · Negotiation · Storage</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Negotiation · Signature <em style="color:#d97706;font-size:11px">⚠ Storage absent</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 11 — GROUPE ROSA  score:3
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="3" data-segment="Medium Account" data-csm="Laurie Pénélaud" data-date="2026-03-19" data-name="groupe rosa" onclick="toggleDetail('groupe-rosa')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/17818919687" class="client-link" target="_blank" onclick="event.stopPropagation()">Groupe Rosa</a></td><td><span class="score-badge score-3">3</span></td><td>19/03/26</td>
+  <td>Laurie</td><td><span class="no-data">—</span></td><td><span class="no-data">—</span></td>
+</tr>
+<tr class="detail-row" id="detail-groupe-rosa"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">REX satisfaction Tomorro — retour d'expérience</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">19/03/26</span>
+            <a href="https://app.modjo.ai/calls/170796" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Charlotte partage un retour d'expérience très positif — satisfaction générale totale, aucun aspect négatif remonté. Échange chaleureux avec cadeau symbolique de remerciement. Aucune demande feature ou problème identifié : relation client épanouie.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (58 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Acceptée : Tomorro x Groupe Rosa — Point de suivi jeu. 23 avr.</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">cginisty@grouperosa.fr</span><span class="email-date">2026-04-16</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: REX client Tomorro</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-pos">Positive</span><span class="email-sender">cginisty@grouperosa.fr</span><span class="email-date">2026-03-19</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: Retour d'expérience sur Tomorro</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-pos">Positive</span><span class="email-sender">cginisty@grouperosa.fr</span><span class="email-date">2026-03-18</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Negotiation · Signature · Storage <em style="color:var(--green);font-size:11px">↑ expansion ×4</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 12 — OEMSERVICES  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Medium Account" data-csm="Noémie Torikian" data-date="2026-03-30" data-name="oemservices" onclick="toggleDetail('oemservices')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/15652973593" class="client-link" target="_blank" onclick="event.stopPropagation()">OEMServices</a></td><td><span class="score-badge score-2">2</span></td><td>30/03/26</td>
+  <td>Noémie</td><td><span class="pill pill-problem">GDPR — admin personal data</span><span class="pill pill-problem">Non-deletable birth date</span></td><td><span class="pill pill-feature">HR space partitioning</span><span class="pill pill-feature">Personal data deletion</span></td>
+</tr>
+<tr class="detail-row" id="detail-oemservices"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-neu">
+        <div class="call-header">
+          <span class="call-title">RGPD & gestion des accès administrateur</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-neu">Neutral</span>
+            <span class="call-date">30/03/26</span>
+            <a href="https://app.modjo.ai/calls/177245" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Préoccupations RGPD : données personnelles d'une administratrice accessibles aux collègues, date de naissance impossible à supprimer. Des espaces de travail RH dédiés sont proposés comme solution. Échange professionnel, constructif, mais teinté d'inquiétudes sur la conformité.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (122 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: Tomorro &lt;&gt; OEMS</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">alexandre.lean@oemservices.aero</span><span class="email-date">2026-04-10</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: Informations personnelles Madame ROBIN</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">sandrine.picarra@oemservices.aero</span><span class="email-date">2026-04-10</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: Tomorro &lt;&gt; OEMServices — Présentation nouveau modèle tarifaire</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">alexandre.lean@oemservices.aero</span><span class="email-date">2026-04-03</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Storage</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Signature <em style="color:#d97706;font-size:11px">⚠ Storage absent</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 13 — QUANTIS  score:3
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="3" data-segment="Strategic Account" data-csm="Noémie Torikian" data-date="2026-03-11" data-name="quantis" onclick="toggleDetail('quantis')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/16063852587" class="client-link" target="_blank" onclick="event.stopPropagation()">Quantis</a></td><td><span class="score-badge score-3">3</span></td><td>11/03/26</td>
+  <td>Noémie</td><td><span class="pill pill-problem">Manual user rights work</span></td><td><span class="pill pill-feature">Creator users list</span><span class="pill pill-feature">Feature documentation</span></td>
+</tr>
+<tr class="detail-row" id="detail-quantis"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Renouvellement licence + activation nouvelles features</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">11/03/26</span>
+            <a href="https://app.modjo.ai/calls/164452" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">"Génial, super, parfait" — échange très positif autour du renouvellement de licence et l'activation de nouvelles fonctionnalités. Quelques points de vigilance sur la gestion manuelle des droits utilisateurs. Bonne dynamique collaborative et relation client solide.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (84 total)</h4>
+      <div class="email-card outgoing">
+        <div class="email-subject">Tomorro &lt;&gt; Quantis — Additional Creator Licenses</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-pos">Positive</span><span class="email-sender">noemie@tomorro.com</span><span class="email-date">2026-04-13</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Re: Tomorro &lt;&gt; Quantis — Additional Creator Licenses</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-pos">Positive</span><span class="email-sender">Berland.Valerie@quantis.com</span><span class="email-date">2026-04-14</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Accepté : Tomorro &lt;&gt; Quantis — Déploiement nouvelles features</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">Berland.Valerie@quantis.com</span><span class="email-date">2026-02-27</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Storage · Negotiation · Signature</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Negotiation · Signature · Storage <em style="color:var(--green);font-size:11px">✓ alignés</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 14 — MF BRANDS GROUP  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Enterprise" data-csm="Laure Voreaux" data-date="2026-03-27" data-name="mf brands group" onclick="toggleDetail('mf-brands')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/10256489519" class="client-link" target="_blank" onclick="event.stopPropagation()">MF Brands Group</a></td><td><span class="score-badge score-2">2</span></td><td>27/03/26</td>
+  <td>Laure</td><td><span class="pill pill-problem">IT blocking add-ins</span><span class="pill pill-problem">Heavy template setup</span></td><td><span class="pill pill-feature">Retroactive archiving</span><span class="pill pill-feature">AI custom fields</span></td>
+</tr>
+<tr class="detail-row" id="detail-mf-brands"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Usage plateforme & test Word Add-in</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">27/03/26</span>
+            <a href="https://app.modjo.ai/calls/176561" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Relation positive, volonté d'adapter la solution à l'organisation complexe multimarque. Blocages IT sur le téléchargement des add-ins et charge de paramétrage des templates. Nouvelles fonctionnalités (Word Add-in, arborescence) bien reçues.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (125 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Acceptée : Tomorro &lt;&gt; MF Brands — Point de suivi adoption</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">oduval@mf-brands.com</span><span class="email-date">2026-04-13</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: Tomorro &lt;&gt; MF Brands — Prochaines étapes</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">oduval@mf-brands.com</span><span class="email-date">2026-03-30</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Storage · Generation</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Storage <em style="color:#dc2626;font-size:11px">⚠ Generation non mesuré</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 15 — TRUFFAUT  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Medium Account" data-csm="Cassandra Mylle" data-date="2026-03-30" data-name="truffaut" onclick="toggleDetail('truffaut')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/10185702922" class="client-link" target="_blank" onclick="event.stopPropagation()">TRUFFAUT</a></td><td><span class="score-badge score-2">2</span></td><td>30/03/26</td>
+  <td>Cassandra</td><td><span class="pill pill-problem">Slow adoption</span><span class="pill pill-problem">Recurring blockers (today)</span></td><td><span class="pill pill-feature">Deadline alerts</span><span class="pill pill-feature">Summary reporting</span></td>
+</tr>
+<tr class="detail-row" id="detail-truffaut"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-neu">
+        <div class="call-header">
+          <span class="call-title">Onboarding — centralisation contrats</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-neu">Neutral</span>
+            <span class="call-date">30/03/26</span>
+            <a href="https://app.modjo.ai/calls/177409" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Bonne adhésion au projet mais onboarding lent dû à une charge de travail élevée. Problèmes d'accès SSO/SAML non résolus. Objectifs : centralisation contrats et alertes sur les échéances. Accompagnement Tomorro proposé pour soutenir l'appropriation.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (72 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Acceptée : Blocker — Truffaut x Tomorro</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Negative</span><span class="email-sender">A.Ravelo-De-Tovar@truffaut.com</span><span class="email-date">2026-04-16</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Refusée : Blocker — Truffaut x Tomorro</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Negative</span><span class="email-sender">G.Hubert@truffaut.com</span><span class="email-date">2026-03-31</span></div>
+      </div>
+      <div class="email-card outgoing">
+        <div class="email-subject">Re: Suivi projet Tomorro</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">cassandra@tomorro.com</span><span class="email-date">2026-03-31</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Negotiation · Signature · Storage</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value" style="color:#dc2626">Not filled in ⚠ no measured activity</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 16 — WHISPLI  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Small Account" data-csm="Laure Voreaux" data-date="2026-04-15" data-name="whispli" onclick="toggleDetail('whispli')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/19574589984" class="client-link" target="_blank" onclick="event.stopPropagation()">Whispli</a></td><td><span class="score-badge score-2">2</span></td><td>15/04/26</td>
+  <td>Laure</td><td><span class="pill pill-problem">Tomorro vs Word process</span><span class="pill pill-problem">AI pre-fill errors</span></td><td><span class="pill pill-feature">Amendment improvements</span><span class="pill pill-feature">Unlimited AI (test)</span></td>
+</tr>
+<tr class="detail-row" id="detail-whispli"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">QBR — process contractuel & avenants</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">15/04/26</span>
+            <a href="https://app.modjo.ai/calls/189718" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Échange constructif et cordial, axé sur l'amélioration des process avenants et l'intégration Slack/Vitaly. Blocages sur le copier-coller de tableaux et l'IA qui pré-remplit mal certaines données. Prochaines étapes actées pour optimiser les workflows.</div>
+      </div>
+      <div class="call-card sent-neg">
+        <div class="call-header">
+          <span class="call-title">Point suivi — adoption et utilité perçue</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-neg">Negative</span>
+            <span class="call-date">20/01/26</span>
+            <a href="https://app.modjo.ai/calls/145115" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">"L'utilité de Tomorro aujourd'hui, elle n'est pas énorme" — faible adoption mesurée, risque d'abandon identifié. Usage limité à quelques contrats, valeur perçue insuffisante par rapport aux attentes initiales.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (45 total)</h4>
+      <div class="email-card outgoing">
+        <div class="email-subject">[Tomorro x Whispli] Point de suivi Avril 2026</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">laure@tomorro.com</span><span class="email-date">2026-04-15</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Accepté: QBR — mar. 28 juil. 2026</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">mohammed.dinoune@whispli.com</span><span class="email-date">2026-04-15</span></div>
+      </div>
+      <div class="email-card outgoing">
+        <div class="email-subject">Re: Tomorro &lt;&gt; Whispli — Proposition de renouvellement</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">margaux@tomorro.com</span><span class="email-date">2026-02-24</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Storage · Generation</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value" style="color:#dc2626">Not filled in ⚠ no measured activity</div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 17 — DRAMA PARIS  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Medium Account" data-csm="Laurie Pénélaud" data-date="2026-04-13" data-name="drama paris" onclick="toggleDetail('drama-paris')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33827234094" class="client-link" target="_blank" onclick="event.stopPropagation()">Drama Paris</a></td><td><span class="score-badge score-2">2</span></td><td>13/04/26</td>
+  <td>Laurie</td><td><span class="pill pill-problem">Sync issue</span><span class="pill pill-problem">Folder access rights</span></td><td><span class="pill pill-feature">Alphabetical contract sort</span><span class="pill pill-feature">Global access rights</span></td>
+</tr>
+<tr class="detail-row" id="detail-drama-paris"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Droits d'accès, playbooks & Word Add-in</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">13/04/26</span>
+            <a href="https://app.modjo.ai/calls/187052" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Problèmes de synchronisation et de droits d'accès clarifiés. Playbooks et Word Add-in présentés, clients satisfaits de l'échange. Tri alphabétique des types de contrats demandé. Collaboration active et ouverts aux améliorations.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (124 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: Problème de synchronisation TOMORRO</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Negative</span><span class="email-sender">t.moses@dramaparis.com</span><span class="email-date">2026-04-13</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Problème de synchronisation TOMORRO</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Negative</span><span class="email-sender">t.moses@dramaparis.com</span><span class="email-date">2026-04-10</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Accepté : Tomorro x Drama — Point de suivi projet</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">t.moses@dramaparis.com</span><span class="email-date">2026-04-13</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Not filled in</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Negotiation · Signature · Storage <em style="color:var(--green);font-size:11px">↑ expansion</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 18 — ETERNITY SYSTEMS  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Medium Account" data-csm="Cassandra Mylle" data-date="2026-03-25" data-name="eternity systems" onclick="toggleDetail('eternity')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/19104989220" class="client-link" target="_blank" onclick="event.stopPropagation()">ETERNITY SYSTEMS</a></td><td><span class="score-badge score-2">2</span></td><td>25/03/26</td>
+  <td>Cassandra</td><td><span class="pill pill-problem">Complex Odoo integration</span><span class="pill pill-problem">Missing advanced signing</span></td><td><span class="pill pill-feature">Entity partitioning</span><span class="pill pill-feature">AI field suggestions</span></td>
+</tr>
+<tr class="detail-row" id="detail-eternity"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-neu">
+        <div class="call-header">
+          <span class="call-title">Migration Tomorro / Odoo / Lucas — planification</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-neu">Neutral</span>
+            <span class="call-date">25/03/26</span>
+            <a href="https://app.modjo.ai/calls/174786" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Avancement sur la migration contrats et modèles CGA/RH, mais charge de travail élevée avant congé maternité crée une pression sur les délais. Difficultés d'intégration automatique Odoo. Échange collaboratif, planification des prochains points.</div>
+      </div>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Bilan adoption — enthousiasme fort</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">12/03/26</span>
+            <a href="https://app.modjo.ai/calls/165171" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">"On n'a plus envie d'utiliser Odoo, on a envie d'utiliser Tomorro" — enthousiasme très fort sur l'adoption de la solution. Signal très positif malgré les complexités d'intégration en cours.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (79 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: Assistance fonctionnalité Tomorro</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">jquiroga@eternity-systems.com</span><span class="email-date">2026-04-07</span></div>
+      </div>
+      <div class="email-card outgoing">
+        <div class="email-subject">Assistance fonctionnalité Tomorro</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">cassandra@tomorro.com</span><span class="email-date">2026-04-03</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Acceptée : Suivi — Eternity Systems x Tomorro</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">obaroin@eternity-systems.com</span><span class="email-date">2026-03-25</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Generation · Negotiation · Signature · Storage</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation <em style="color:#d97706;font-size:11px">⚠ 3/4 use cases non encore actifs (client récent)</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 19 — ENERGITER  score:3
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="3" data-segment="Medium Account" data-csm="Noémie Torikian" data-date="2026-04-13" data-name="energiter" onclick="toggleDetail('energiter')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/17392815503" class="client-link" target="_blank" onclick="event.stopPropagation()">Energiter</a></td><td><span class="score-badge score-3">3</span></td><td>13/04/26</td>
+  <td>Noémie</td><td><span class="pill pill-problem">No auto-extensions</span><span class="pill pill-problem">Signature zone too large</span></td><td><span class="pill pill-feature">Auto amendment updates</span><span class="pill pill-feature">Custom fields export</span></td>
+</tr>
+<tr class="detail-row" id="detail-energiter"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Power user review & nouvelles fonctionnalités</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">13/04/26</span>
+            <a href="https://app.modjo.ai/calls/187177" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Client très actif — power user avec une forte croissance d'usage. Quelques irritants remontés (prorogations manuelles, zone de signature trop grande) mais reconnaissance explicite de l'accompagnement et des évolutions produit. Enthousiasme pour les nouvelles features.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (109 total)</h4>
+      <div class="email-card incoming">
+        <div class="email-subject">Acceptée : Tomorro &lt;&gt; Energiter — Renouvellement contrat</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">gutherz@energiter.fr</span><span class="email-date">2026-04-14</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Accepté : Tomorro &lt;&gt; Energiter — Renouvellement contrat</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">godefroy@energiter.fr</span><span class="email-date">2026-04-13</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">RE: Tomorro &lt;&gt; Energiter — Incident 24 &amp; 25 février</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Negative</span><span class="email-sender">godefroy@energiter.fr</span><span class="email-date">2026-03-02</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="usage-grid">
+        <div class="usage-item"><div class="usage-label">Declared</div><div class="usage-value">Storage · Negotiation · Generation · Signature</div></div>
+        <div class="usage-item"><div class="usage-label">Actual</div><div class="usage-value">Generation · Negotiation · Signature · Storage <em style="color:var(--green);font-size:11px">✓ alignés</em></div></div>
+      </div>
+    </div>
+  </div>
+</div></td></tr>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 20 — OUIHELP.FR  score:2
+═══════════════════════════════════════════════════ -->
+<tr class="clickable" data-score="2" data-segment="Medium Account" data-csm="Margaux Chatel" data-date="2026-03-24" data-name="ouihelp.fr" onclick="toggleDetail('ouihelp')">
+<td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/10208677632" class="client-link" target="_blank" onclick="event.stopPropagation()">Ouihelp.fr</a></td><td><span class="score-badge score-2">2</span></td><td>24/03/26</td>
+  <td>Margaux</td><td><span class="pill pill-problem">Internal restructuring</span><span class="pill pill-problem">Download buttons access</span></td><td><span class="pill pill-feature">New user training</span><span class="pill pill-feature">Penny Lane integration</span></td>
+</tr>
+<tr class="detail-row" id="detail-ouihelp"><td colspan="6"><div class="detail-content">
+  <div class="detail-cols">
+    <div class="detail-section">
+      <h4>📞 Modjo calls</h4>
+      <div class="call-card sent-pos">
+        <div class="call-header">
+          <span class="call-title">Fusion équipes & formation Guillaume</span>
+          <div class="call-meta">
+            <span class="sent-badge sent-pos">Positive</span>
+            <span class="call-date">24/03/26</span>
+            <a href="https://app.modjo.ai/calls/172814" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a>
+          </div>
+        </div>
+        <div class="call-summary">Échange constructif malgré la période de réorganisation interne. Formation d'un nouveau user planifiée, intégration Penny Lane envisagée une fois la situation stabilisée. Ton cordial, bonne volonté des deux côtés.</div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>📧 Recent emails (30 total)</h4>
+      <div class="email-card outgoing">
+        <div class="email-subject">Tomorro &lt;&gt; Ouihelp: Prochaines étapes et prochaines réunions</div>
+        <div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">linh@tomorro.com</span><span class="email-date">2026-03-24</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Accès aux boutons de téléchargement</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">sophie.vrignaud@ouihelp.fr</span><span class="email-date">2026-03-06</span></div>
+      </div>
+      <div class="email-card incoming">
+        <div class="email-subject">Re: Question users externes</div>
+        <div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">sophie.vrignaud@ouihelp.fr</span><span class="email-date">2026-03-06</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-cols" style="margin-top:14px">
+    </div>
+    <div class="detail-section">
+      <h4>🎯 Declared vs actual use cases</h4>
+      <div class="empty-state">No usage data found in HubSpot for this account.</div>
+    </div>
+  </div>
+</div></td></tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div><!-- .page-main -->
+
+    <!-- SIDEBAR -->
+    <aside class="page-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">Score distribution</div>
+        <div class="sidebar-card-sub">Visible clients</div>
+        <canvas id="sidebarDonutChart" width="236" height="200"></canvas>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">Scores by segment</div>
+        <div class="sidebar-card-sub">Filtered view</div>
+        <canvas id="sidebarSegmentChart" width="236" height="210"></canvas>
+      </div>
+    </aside>
+  </div><!-- .page-body -->
+
+  <footer>Moody's — Customer Mood Dashboard · HubSpot + Modjo data · Generated on 16/04/2026</footer>
+</div><!-- .pw -->
+
+<script>
+var activeFilters = { score: null, search: "", csm: "", seg: "" };
+var sidebarDonut = null, sidebarSegment = null;
+var sortDir = [1,1,1,1,1];
+var SEGS = ["Enterprise","Strategic Account","Key Account","Medium Account","Small Account"];
+
+function applyFilters() {
+  activeFilters.search = document.getElementById("searchInput").value.toLowerCase();
+  activeFilters.csm = document.getElementById("csmFilter").value;
+  activeFilters.seg = document.getElementById("segFilter").value;
+  var rows = document.querySelectorAll("#tableBody tr.clickable");
+  var visible = 0, scoreCounts = {"3":0,"2":0,"1":0,"na":0};
+  var segData = {};
+  SEGS.forEach(function(s){ segData[s]={"3":0,"2":0,"1":0,"na":0}; });
+  rows.forEach(function(row) {
+    var score = row.getAttribute("data-score")||"na";
+    var seg   = row.getAttribute("data-segment")||"";
+    var csm   = row.getAttribute("data-csm")||"";
+    var name  = row.getAttribute("data-name")||"";
+    var matchScore  = !activeFilters.score || score === activeFilters.score;
+    var matchSearch = !activeFilters.search || name.indexOf(activeFilters.search) >= 0;
+    var matchCsm    = !activeFilters.csm  || csm === activeFilters.csm;
+    var matchSeg    = !activeFilters.seg  || seg === activeFilters.seg;
+    var show = matchScore && matchSearch && matchCsm && matchSeg;
+    var slug = row.getAttribute("onclick").replace("toggleDetail('","").replace("')","");
+    var detailRow = document.getElementById("detail-" + slug);
+    if (show) {
+      row.style.display = "";
+      visible++;
+      var sc = score in scoreCounts ? score : "na";
+      scoreCounts[sc]++;
+      if (seg && segData[seg]) segData[seg][sc]++;
+    } else {
+      row.style.display = "none";
+      if (detailRow) { detailRow.style.display = "none"; detailRow.classList.remove("open"); row.classList.remove("open"); }
+    }
+  });
+  var lc = document.getElementById("liveCount"); if (lc) lc.textContent = visible;
+  var ind = document.getElementById("filterIndicator");
+  if (activeFilters.score || activeFilters.search || activeFilters.csm || activeFilters.seg) {
+    ind.innerHTML = "Active filter — <strong>" + visible + " client" + (visible>1?"s":"") + "</strong> shown";
+  } else { ind.innerHTML = ""; }
+  updateSidebarCharts(scoreCounts, segData, SEGS);
+  document.getElementById("kpi3").textContent = scoreCounts["3"];
+  document.getElementById("kpi2").textContent = scoreCounts["2"];
+  document.getElementById("kpi1").textContent = scoreCounts["1"];
+
+}
+
+document.querySelectorAll(".kpi-card[data-filter]").forEach(function(card) {
+  card.addEventListener("click", function() {
+    var f = card.getAttribute("data-filter");
+    if (activeFilters.score === f) {
+      activeFilters.score = null;
+      card.classList.remove("filter-active");
+    } else {
+      document.querySelectorAll(".kpi-card[data-filter]").forEach(function(c){ c.classList.remove("filter-active"); });
+      activeFilters.score = f;
+      card.classList.add("filter-active");
+    }
+    applyFilters();
+  });
+});
+
+function toggleDetail(slug) {
+  var row = document.getElementById("detail-" + slug);
+  if (!row) return;
+  var tr = row.previousElementSibling;
+  if (row.classList.contains("open")) {
+    row.classList.remove("open");
+    row.style.display = "none";
+    if (tr) tr.classList.remove("open");
+  } else {
+    row.classList.add("open");
+    row.style.display = "table-row";
+    if (tr) tr.classList.add("open");
+  }
+}
+
+function sortTable(col) {
+  var tbody = document.getElementById("tableBody");
+  var pairs = [];
+  var rows = Array.from(tbody.querySelectorAll("tr.clickable"));
+  rows.forEach(function(r) {
+    var d = tbody.querySelector("#detail-" + r.getAttribute("onclick").replace("toggleDetail('","").replace("')",""));
+    pairs.push([r, d]);
+  });
+  var dir = sortDir[col];
+  pairs.sort(function(a, b) {
+    var va, vb;
+    if (col===0) { va=a[0].getAttribute("data-name")||""; vb=b[0].getAttribute("data-name")||""; }
+    else if (col===1) { va=parseInt(a[0].getAttribute("data-score")||"0"); vb=parseInt(b[0].getAttribute("data-score")||"0"); return (vb-va)*dir; }
+    else if (col===2) { va=a[0].getAttribute("data-date")||""; vb=b[0].getAttribute("data-date")||""; }
+    else if (col===3) { va=(a[0].getAttribute("data-csm")||"").split(" ")[0]; vb=(b[0].getAttribute("data-csm")||"").split(" ")[0]; }
+    else return 0;
+    if (va < vb) return -1*dir; if (va > vb) return 1*dir; return 0;
+  });
+  sortDir[col] = -dir;
+  pairs.forEach(function(p) { if (p[0]) tbody.appendChild(p[0]); if (p[1]) tbody.appendChild(p[1]); });
+}
+
+function resetFilters() {
+  activeFilters = { score: null, search: "", csm: "", seg: "" };
+  document.getElementById("searchInput").value = "";
+  document.getElementById("csmFilter").value = "";
+  document.getElementById("segFilter").value = "";
+  document.querySelectorAll(".kpi-card[data-filter]").forEach(function(c){ c.classList.remove("filter-active"); });
+  applyFilters();
+}
+
+function populateDropdowns() {
+  var csmSet = {}, segSet = {};
+  document.querySelectorAll("#tableBody tr.clickable").forEach(function(row) {
+    var csm = row.getAttribute("data-csm")||""; if (csm) csmSet[csm]=1;
+    var seg = row.getAttribute("data-segment")||""; if (seg) segSet[seg]=1;
+  });
+  var csmSel = document.getElementById("csmFilter");
+  Object.keys(csmSet).sort().forEach(function(c){ var o=document.createElement("option"); o.value=c; o.textContent=c; csmSel.appendChild(o); });
+  var segSel = document.getElementById("segFilter");
+  SEGS.forEach(function(s){ if (segSet[s]){ var o=document.createElement("option"); o.value=s; o.textContent=s; segSel.appendChild(o); }});
+}
+
+function initSidebarCharts() {
+  var donutCtx = document.getElementById("sidebarDonutChart").getContext("2d");
+  sidebarDonut = new Chart(donutCtx, {
+    type: "doughnut",
+    data: { labels:["Excellent","Neutral","Alert","N/A"], datasets:[{ data:[4,16,0,0], backgroundColor:["#22c55e","#f59e0b","#ef4444","#e2e8f0"], borderWidth:2, borderColor:"#fff" }] },
+    options: { plugins:{ legend:{ position:"bottom", labels:{ font:{size:11}, padding:8 } } }, cutout:"65%", responsive:false, maintainAspectRatio:false }
+  });
+  var segCtx = document.getElementById("sidebarSegmentChart").getContext("2d");
+  sidebarSegment = new Chart(segCtx, {
+    type: "bar",
+    data: { labels: SEGS, datasets:[
+      { label:"Excellent", data:[0,0,0,0,0], backgroundColor:"#22c55e" },
+      { label:"Neutral",    data:[0,0,0,0,0], backgroundColor:"#f59e0b" },
+      { label:"Alert",    data:[0,0,0,0,0], backgroundColor:"#ef4444" },
+      { label:"N/A",       data:[0,0,0,0,0], backgroundColor:"#e2e8f0" }
+    ]},
+    options: { indexAxis:"y", plugins:{ legend:{ position:"bottom", labels:{ font:{size:10}, padding:6 } } },
+      scales:{ x:{ stacked:true, ticks:{font:{size:10}} }, y:{ stacked:true, ticks:{font:{size:10}} } },
+      responsive:false, maintainAspectRatio:false }
+  });
+}
+
+function updateSidebarCharts(scoreCounts, segData, SEGS) {
+  if (!sidebarDonut || !sidebarSegment) return;
+  sidebarDonut.data.datasets[0].data = [scoreCounts["3"]||0, scoreCounts["2"]||0, scoreCounts["1"]||0, scoreCounts["na"]||0];
+  sidebarDonut.update("none");
+  ["3","2","1","na"].forEach(function(sc, di) {
+    sidebarSegment.data.datasets[di].data = SEGS.map(function(seg){ return (segData[seg]&&segData[seg][sc])||0; });
+  });
+  sidebarSegment.update("none");
+}
+
+function exportExcel() {
+  var wb = XLSX.utils.book_new();
+  var data = [["Client","Score","Segment","CSM","Last Call","Key Issues","Feature Requests"]];
+  document.querySelectorAll("#tableBody tr.clickable").forEach(function(row) {
+    if (row.style.display === "none") return;
+    var cells = row.querySelectorAll("td");
+    var client = cells[0] ? cells[0].textContent.trim() : "";
+    var score  = cells[1] ? cells[1].textContent.trim() : "";
+    var date   = cells[2] ? cells[2].textContent.trim() : "";
+    var probs  = cells[4] ? Array.from(cells[4].querySelectorAll(".pill")).map(function(p){return p.textContent.trim();}).join(", ") : "";
+    var feats  = cells[5] ? Array.from(cells[5].querySelectorAll(".pill")).map(function(p){return p.textContent.trim();}).join(", ") : "";
+    var seg = row.getAttribute("data-segment")||"";
+    var csm = row.getAttribute("data-csm")||"";
+    data.push([client, score, seg, csm, date, probs, feats]);
+  });
+  var ws = XLSX.utils.aoa_to_sheet(data);
+  ws["!cols"] = [{wch:22},{wch:8},{wch:20},{wch:20},{wch:14},{wch:40},{wch:40}];
+  var hdr = ["A1","B1","C1","D1","E1","F1","G1"];
+  hdr.forEach(function(cell) {
+    if (ws[cell]) ws[cell].s = { fill:{fgColor:{rgb:"1d2939"}}, font:{color:{rgb:"ffffff"},bold:true}, alignment:{horizontal:"center"} };
+  });
+  for (var i=2; i<=data.length; i++) {
+    var sc = ws["B"+i] ? ws["B"+i].v : "";
+    var fill = sc=="3" ? "dcfce7" : sc=="2" ? "fef3c7" : sc=="1" ? "fee2e2" : "f1f5f9";
+    var fc   = sc=="3" ? "15803d" : sc=="2" ? "b45309" : sc=="1" ? "b91c1c" : "94a3b8";
+    if (ws["B"+i]) ws["B"+i].s = { fill:{fgColor:{rgb:fill}}, font:{color:{rgb:fc},bold:true}, alignment:{horizontal:"center"} };
+    if (i%2===0) {
+      ["A","C","D","E","F","G"].forEach(function(col){
+        if (ws[col+i]) { ws[col+i].s = ws[col+i].s || {}; ws[col+i].s.fill = {fgColor:{rgb:"f8fafc"}}; }
+      });
+    }
+  }
+  XLSX.utils.book_append_sheet(wb, ws, "Sentiment");
+  var today = new Date(); var dd=String(today.getDate()).padStart(2,"0"); var mm=String(today.getMonth()+1).padStart(2,"0"); var yy=today.getFullYear();
+  XLSX.writeFile(wb, "Customer_Sentiment_Dashboard_"+yy+"-"+mm+"-"+dd+".xlsx");
+}
+
+window.addEventListener('load', function() {
+  populateDropdowns();
+  setTimeout(function() {
+    initSidebarCharts();
+    if (sidebarDonut) sidebarDonut.resize();
+    if (sidebarSegment) sidebarSegment.resize();
+    applyFilters();
+  }, 100);
+});
+</script>
+</body>
+</html>
