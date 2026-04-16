@@ -74,36 +74,6 @@ function parseCalls(inner) {
   return cards
 }
 
-const subtitleMatch = html.match(
-  /<div class="subtitle">([^<]+)<\/div>/,
-)
-const subtitle = subtitleMatch ? subtitleMatch[1].trim() : ""
-
-const kpis = []
-const kpiRe =
-  /<div class="kpi-card ([^"]+)">\s*<div class="kpi-label">([^<]+)<\/div>\s*<div class="kpi-value">([^<]+)<\/div>\s*<div class="kpi-label">([^<]+)<\/div>\s*<\/div>/g
-let km
-while ((km = kpiRe.exec(html)) !== null) {
-  kpis.push({
-    tone: km[1].trim(),
-    label: km[2].trim(),
-    value: km[3].trim(),
-    sublabel: km[4].trim(),
-  })
-}
-
-const segmentOptions = [{ value: "all", label: "Tous les segments" }]
-const segSelect = html.match(
-  /<select id="filterSegment"[\s\S]*?<\/select>/,
-)
-if (segSelect) {
-  const optRe = /<option value="([^"]+)">([^<]+)<\/option>/g
-  let om
-  while ((om = optRe.exec(segSelect[0])) !== null) {
-    if (om[1] !== "all") segmentOptions.push({ value: om[1], label: om[2] })
-  }
-}
-
 const clients = []
 const rowRe =
   /<tr class="clickable"[^>]*onclick="toggleDetail\('([^']+)'\)"[^>]*data-score="([^"]*)"[^>]*data-segment="([^"]*)"[^>]*data-name="([^"]*)">([\s\S]*?)<\/tr>\s*<tr class="detail-row" id="detail-\1">([\s\S]*?)<\/tr>/g
@@ -176,30 +146,5 @@ while ((rm = rowRe.exec(html)) !== null) {
   })
 }
 
-const footerMatch = html.match(/<footer>([^<]+)<\/footer>/)
-const footer = footerMatch ? footerMatch[1].trim() : ""
-
-const scoreOptions = [
-  { value: "all", label: "Tous les scores" },
-  { value: "1", label: "🔴 Alerte (1)" },
-  { value: "2", label: "🟠 Attention (2)" },
-  { value: "3", label: "🟢 Excellent (3)" },
-  { value: "na", label: "Sans données" },
-]
-
-const payload = {
-  meta: {
-    title: "Tomorro — Customer Sentiment Dashboard",
-    subtitle,
-    footer,
-  },
-  kpis,
-  filters: {
-    segments: segmentOptions,
-    scoreOptions,
-  },
-  clients,
-}
-
-fs.writeFileSync(outPath, JSON.stringify(payload, null, 2), "utf8")
+fs.writeFileSync(outPath, JSON.stringify(clients, null, 2), "utf8")
 console.log("Wrote", outPath, "clients:", clients.length)

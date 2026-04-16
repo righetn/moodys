@@ -1,1069 +1,930 @@
-{
-  "meta": {
-    "title": "Tomorro — Customer Sentiment Dashboard",
-    "subtitle": "Généré le 16/04/2026 à 11h16 · 30 clients analysés (phase Run) · Données Modjo × HubSpot",
-    "footer": "Tomorro Customer Sentiment Dashboard · Données HubSpot × Modjo · Analyse automatique"
+[
+  {
+    "id": "46467510315",
+    "searchName": "cité internationale universitaire de paris - rh",
+    "displayName": "Cité internationale universitaire de Paris - RH",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/46467510315",
+    "segment": "Key Account",
+    "score": null,
+    "scoreFilter": "na",
+    "trend": "stable",
+    "trendSymbol": "—",
+    "sentiment": "—",
+    "lastCall": null,
+    "problems": [],
+    "features": [],
+    "detailTitle": "Cité internationale universitaire de Paris - RH",
+    "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
+    "calls": []
   },
-  "kpis": [
-    {
-      "tone": "excellent",
-      "label": "Excellent (Score 3)",
-      "value": "9",
-      "sublabel": "30% des clients"
-    },
-    {
-      "tone": "attention",
-      "label": "Attention (Score 2)",
-      "value": "9",
-      "sublabel": "30% des clients"
-    },
-    {
-      "tone": "alert",
-      "label": "Alerte (Score 1)",
-      "value": "4",
-      "sublabel": "13% des clients"
-    },
-    {
-      "tone": "avg",
-      "label": "Score Moyen",
-      "value": "2.23",
-      "sublabel": "sur 3"
-    },
-    {
-      "tone": "nodata",
-      "label": "Sans données",
-      "value": "8",
-      "sublabel": "27% des clients"
-    }
-  ],
-  "filters": {
-    "segments": [
+  {
+    "id": "45987145386",
+    "searchName": "cheerz rh",
+    "displayName": "Cheerz RH",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/45987145386",
+    "segment": "Small Account",
+    "score": null,
+    "scoreFilter": "na",
+    "trend": "stable",
+    "trendSymbol": "—",
+    "sentiment": "—",
+    "lastCall": null,
+    "problems": [],
+    "features": [],
+    "detailTitle": "Cheerz RH",
+    "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
+    "calls": []
+  },
+  {
+    "id": "44788785503",
+    "searchName": "pasqal - corporate",
+    "displayName": "Pasqal - Corporate",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/44788785503",
+    "segment": "Key Account",
+    "score": null,
+    "scoreFilter": "na",
+    "trend": "stable",
+    "trendSymbol": "—",
+    "sentiment": "—",
+    "lastCall": null,
+    "problems": [],
+    "features": [],
+    "detailTitle": "Pasqal - Corporate",
+    "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
+    "calls": []
+  },
+  {
+    "id": "41392015388",
+    "searchName": "polarise",
+    "displayName": "Polarise",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/41392015388",
+    "segment": "Medium Account",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "up",
+    "trendSymbol": "↑",
+    "sentiment": "Positif",
+    "lastCall": "2026-03-18",
+    "problems": [],
+    "features": ["Amélioration du workflow de signature"],
+    "detailTitle": "Détail des 3 derniers appels — Polarise",
+    "emptyMessage": null,
+    "calls": [
       {
-        "value": "all",
-        "label": "Tous les segments"
+        "title": "Point de suivi Polarise",
+        "sentiment": "Positif",
+        "date": "2026-03-18",
+        "summary": "Client très satisfait de la plateforme. Utilisation en croissance. Bon feedback sur les dernières fonctionnalités déployées."
       },
       {
-        "value": "Enterprise",
-        "label": "Enterprise"
+        "title": "Revue trimestrielle Polarise",
+        "sentiment": "Positif",
+        "date": "2026-02-12",
+        "summary": "Bilan très positif. Le client recommande Tomorro en interne. Pas de problème remonté."
       },
       {
-        "value": "Strategic Account",
-        "label": "Strategic Account"
-      },
-      {
-        "value": "Key Account",
-        "label": "Key Account"
-      },
-      {
-        "value": "Medium Account",
-        "label": "Medium Account"
-      },
-      {
-        "value": "Small Account",
-        "label": "Small Account"
-      }
-    ],
-    "scoreOptions": [
-      {
-        "value": "all",
-        "label": "Tous les scores"
-      },
-      {
-        "value": "1",
-        "label": "🔴 Alerte (1)"
-      },
-      {
-        "value": "2",
-        "label": "🟠 Attention (2)"
-      },
-      {
-        "value": "3",
-        "label": "🟢 Excellent (3)"
-      },
-      {
-        "value": "na",
-        "label": "Sans données"
+        "title": "Check-in Polarise",
+        "sentiment": "Neutre",
+        "date": "2026-01-15",
+        "summary": "Point rapide, tout fonctionne bien. Quelques questions sur les nouvelles fonctionnalités."
       }
     ]
   },
-  "clients": [
-    {
-      "id": "46467510315",
-      "searchName": "cité internationale universitaire de paris - rh",
-      "displayName": "Cité internationale universitaire de Paris - RH",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/46467510315",
-      "segment": "Key Account",
-      "score": null,
-      "scoreFilter": "na",
-      "trend": "stable",
-      "trendSymbol": "—",
-      "sentiment": "—",
-      "lastCall": null,
-      "problems": [],
-      "features": [],
-      "detailTitle": "Cité internationale universitaire de Paris - RH",
-      "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-      "calls": []
-    },
-    {
-      "id": "45987145386",
-      "searchName": "cheerz rh",
-      "displayName": "Cheerz RH",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/45987145386",
-      "segment": "Small Account",
-      "score": null,
-      "scoreFilter": "na",
-      "trend": "stable",
-      "trendSymbol": "—",
-      "sentiment": "—",
-      "lastCall": null,
-      "problems": [],
-      "features": [],
-      "detailTitle": "Cheerz RH",
-      "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-      "calls": []
-    },
-    {
-      "id": "44788785503",
-      "searchName": "pasqal - corporate",
-      "displayName": "Pasqal - Corporate",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/44788785503",
-      "segment": "Key Account",
-      "score": null,
-      "scoreFilter": "na",
-      "trend": "stable",
-      "trendSymbol": "—",
-      "sentiment": "—",
-      "lastCall": null,
-      "problems": [],
-      "features": [],
-      "detailTitle": "Pasqal - Corporate",
-      "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-      "calls": []
-    },
-    {
-      "id": "41392015388",
-      "searchName": "polarise",
-      "displayName": "Polarise",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/41392015388",
-      "segment": "Medium Account",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "up",
-      "trendSymbol": "↑",
-      "sentiment": "Positif",
-      "lastCall": "2026-03-18",
-      "problems": [],
-      "features": [
-        "Amélioration du workflow de signature"
-      ],
-      "detailTitle": "Détail des 3 derniers appels — Polarise",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point de suivi Polarise",
-          "sentiment": "Positif",
-          "date": "2026-03-18",
-          "summary": "Client très satisfait de la plateforme. Utilisation en croissance. Bon feedback sur les dernières fonctionnalités déployées."
-        },
-        {
-          "title": "Revue trimestrielle Polarise",
-          "sentiment": "Positif",
-          "date": "2026-02-12",
-          "summary": "Bilan très positif. Le client recommande Tomorro en interne. Pas de problème remonté."
-        },
-        {
-          "title": "Check-in Polarise",
-          "sentiment": "Neutre",
-          "date": "2026-01-15",
-          "summary": "Point rapide, tout fonctionne bien. Quelques questions sur les nouvelles fonctionnalités."
-        }
-      ]
-    },
-    {
-      "id": "40695694084",
-      "searchName": "ozi sas",
-      "displayName": "Ozi SAS",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/40695694084",
-      "segment": "Medium Account",
-      "score": null,
-      "scoreFilter": "na",
-      "trend": "stable",
-      "trendSymbol": "—",
-      "sentiment": "—",
-      "lastCall": null,
-      "problems": [],
-      "features": [],
-      "detailTitle": "Ozi SAS",
-      "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-      "calls": []
-    },
-    {
-      "id": "35599744087",
-      "searchName": "kalhyge",
-      "displayName": "Kalhyge",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/35599744087",
-      "segment": "Small Account",
-      "score": null,
-      "scoreFilter": "na",
-      "trend": "stable",
-      "trendSymbol": "—",
-      "sentiment": "—",
-      "lastCall": null,
-      "problems": [],
-      "features": [],
-      "detailTitle": "Kalhyge",
-      "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-      "calls": []
-    },
-    {
-      "id": "35251683353",
-      "searchName": "vertone rh",
-      "displayName": "Vertone RH",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/35251683353",
-      "segment": "Small Account",
-      "score": null,
-      "scoreFilter": "na",
-      "trend": "stable",
-      "trendSymbol": "—",
-      "sentiment": "—",
-      "lastCall": null,
-      "problems": [],
-      "features": [],
-      "detailTitle": "Vertone RH",
-      "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-      "calls": []
-    },
-    {
-      "id": "34261862152",
-      "searchName": "gl events rh",
-      "displayName": "GL Events RH",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/34261862152",
-      "segment": "Enterprise",
-      "score": 1,
-      "scoreFilter": "1",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Négatif",
-      "lastCall": "2026-03-25",
-      "problems": [
-        "Problèmes récurrents d'intégration",
-        "Lenteurs signalées sur l'éditeur",
-        "Manque de support réactif"
-      ],
-      "features": [
-        "Intégration SIRH améliorée",
-        "Performance éditeur"
-      ],
-      "detailTitle": "Détail des 4 derniers appels — GL Events RH",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Escalade GL Events RH",
-          "sentiment": "Négatif",
-          "date": "2026-03-25",
-          "summary": "Client frustré par des bugs récurrents sur l'intégration SIRH. Menace de réévaluer l'outil si pas d'amélioration rapide."
-        },
-        {
-          "title": "Point GL Events RH",
-          "sentiment": "Négatif",
-          "date": "2026-03-05",
-          "summary": "Remontée de lenteurs sur l'éditeur de contrats. Le client exprime son mécontentement sur le temps de résolution des tickets."
-        },
-        {
-          "title": "Suivi GL Events RH",
-          "sentiment": "Négatif",
-          "date": "2026-02-10",
-          "summary": "Problèmes d'intégration toujours non résolus. Le client est très mécontent."
-        },
-        {
-          "title": "Bilan GL Events RH",
-          "sentiment": "Neutre",
-          "date": "2026-01-20",
-          "summary": "Discussion sur les axes d'amélioration. Le client reste prudent mais ouvert."
-        }
-      ]
-    },
-    {
-      "id": "34245827142",
-      "searchName": "panda",
-      "displayName": "Panda",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/34245827142",
-      "segment": "Small Account",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Neutre",
-      "lastCall": "2026-03-10",
-      "problems": [
-        "Quelques difficultés d'adoption par les équipes"
-      ],
-      "features": [
-        "Modèles de contrats plus flexibles"
-      ],
-      "detailTitle": "Détail des 2 derniers appels — Panda",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Panda/WWF",
-          "sentiment": "Neutre",
-          "date": "2026-03-10",
-          "summary": "Utilisation stable mais limitée. Le client souhaite plus de modèles de contrats adaptés à leur secteur."
-        },
-        {
-          "title": "Suivi Panda",
-          "sentiment": "Neutre",
-          "date": "2026-01-28",
-          "summary": "Pas de problème majeur. Adoption encore partielle au sein des équipes."
-        }
-      ]
-    },
-    {
-      "id": "34259224328",
-      "searchName": "rémy cointreau - cep",
-      "displayName": "Rémy Cointreau - CEP",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/34259224328",
-      "segment": "Enterprise",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Neutre",
-      "lastCall": "2026-03-20",
-      "problems": [
-        "Complexité de configuration pour les contrats internationaux"
-      ],
-      "features": [
-        "Support multi-langue amélioré",
-        "Gestion des entités juridiques"
-      ],
-      "detailTitle": "Détail des 3 derniers appels — Rémy Cointreau - CEP",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Revue Rémy Cointreau",
-          "sentiment": "Neutre",
-          "date": "2026-03-20",
-          "summary": "Le client utilise bien la plateforme mais remonte la complexité pour les contrats multi-entités internationaux."
-        },
-        {
-          "title": "Point Rémy Cointreau",
-          "sentiment": "Positif",
-          "date": "2026-02-15",
-          "summary": "Bonne satisfaction globale. Quelques demandes d'évolution sur le multi-langue."
-        },
-        {
-          "title": "Check-in Rémy Cointreau",
-          "sentiment": "Neutre",
-          "date": "2026-01-10",
-          "summary": "Utilisation régulière. Le client attend des améliorations sur la gestion des entités juridiques."
-        }
-      ]
-    },
-    {
-      "id": "33827234094",
-      "searchName": "drama paris",
-      "displayName": "Drama Paris",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/33827234094",
-      "segment": "Medium Account",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "up",
-      "trendSymbol": "↑",
-      "sentiment": "Positif",
-      "lastCall": "2026-04-02",
-      "problems": [],
-      "features": [],
-      "detailTitle": "Détail des 3 derniers appels — Drama Paris",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Drama Paris",
-          "sentiment": "Positif",
-          "date": "2026-04-02",
-          "summary": "Excellent retour. Le client est très enthousiaste sur les gains de temps réalisés grâce à Tomorro."
-        },
-        {
-          "title": "Suivi Drama Paris",
-          "sentiment": "Positif",
-          "date": "2026-02-20",
-          "summary": "Adoption complète par les équipes. Le client envisage d'étendre l'usage à d'autres départements."
-        },
-        {
-          "title": "Bilan Drama Paris",
-          "sentiment": "Neutre",
-          "date": "2026-01-05",
-          "summary": "Bon bilan de fin d'année. Quelques ajustements demandés mais rien de bloquant."
-        }
-      ]
-    },
-    {
-      "id": "33695278612",
-      "searchName": "infopro digital rh",
-      "displayName": "Infopro Digital RH",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/33695278612",
-      "segment": "Strategic Account",
-      "score": null,
-      "scoreFilter": "na",
-      "trend": "stable",
-      "trendSymbol": "—",
-      "sentiment": "—",
-      "lastCall": null,
-      "problems": [],
-      "features": [],
-      "detailTitle": "Infopro Digital RH",
-      "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-      "calls": []
-    },
-    {
-      "id": "50095592233",
-      "searchName": "enix",
-      "displayName": "Enix",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/50095592233",
-      "segment": "Small Account",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Positif",
-      "lastCall": "2026-03-28",
-      "problems": [],
-      "features": [
-        "API d'export"
-      ],
-      "detailTitle": "Détail des 2 derniers appels — Enix",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Enix",
-          "sentiment": "Positif",
-          "date": "2026-03-28",
-          "summary": "Le client est satisfait. Utilisation fluide et régulière. Demande mineure sur l'API d'export."
-        },
-        {
-          "title": "Suivi Enix",
-          "sentiment": "Positif",
-          "date": "2026-02-18",
-          "summary": "Tout fonctionne bien. Le client apprécie la simplicité de l'outil."
-        }
-      ]
-    },
-    {
-      "id": "25976217869",
-      "searchName": "habitation batiment",
-      "displayName": "Habitation Batiment",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/25976217869",
-      "segment": "Medium Account",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Neutre",
-      "lastCall": "2026-03-12",
-      "problems": [
-        "Difficulté à former les nouveaux arrivants"
-      ],
-      "features": [
-        "Tutoriels intégrés",
-        "Parcours d'onboarding utilisateur"
-      ],
-      "detailTitle": "Détail des 2 derniers appels — Habitation Batiment",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Habitation Batiment",
-          "sentiment": "Neutre",
-          "date": "2026-03-12",
-          "summary": "Le client remonte des difficultés pour former les nouveaux utilisateurs. Souhaite des tutoriels intégrés."
-        },
-        {
-          "title": "Suivi Habitation Batiment",
-          "sentiment": "Neutre",
-          "date": "2026-02-05",
-          "summary": "Utilisation correcte mais pas optimale. Le client aimerait un meilleur onboarding pour ses équipes."
-        }
-      ]
-    },
-    {
-      "id": "42606417725",
-      "searchName": "gp explorer",
-      "displayName": "GP Explorer",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/42606417725",
-      "segment": "Small Account",
-      "score": null,
-      "scoreFilter": "na",
-      "trend": "stable",
-      "trendSymbol": "—",
-      "sentiment": "—",
-      "lastCall": null,
-      "problems": [],
-      "features": [],
-      "detailTitle": "GP Explorer",
-      "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-      "calls": []
-    },
-    {
-      "id": "25089959216",
-      "searchName": "pousse",
-      "displayName": "POUSSE",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/25089959216",
-      "segment": "Small Account",
-      "score": 1,
-      "scoreFilter": "1",
-      "trend": "down",
-      "trendSymbol": "↓",
-      "sentiment": "Négatif",
-      "lastCall": "2026-04-05",
-      "problems": [
-        "Bugs fréquents sur la signature électronique",
-        "Temps de réponse support trop long",
-        "Fonctionnalités manquantes vs concurrent"
-      ],
-      "features": [
-        "Signature mobile",
-        "Rappels automatiques"
-      ],
-      "detailTitle": "Détail des 3 derniers appels — POUSSE",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Escalade POUSSE",
-          "sentiment": "Négatif",
-          "date": "2026-04-05",
-          "summary": "Le client menace de churner. Bugs récurrents sur la signature électronique. Très insatisfait du support."
-        },
-        {
-          "title": "Point POUSSE",
-          "sentiment": "Négatif",
-          "date": "2026-03-15",
-          "summary": "Nouvelles remontées de bugs. Le client compare défavorablement Tomorro à un concurrent."
-        },
-        {
-          "title": "Suivi POUSSE",
-          "sentiment": "Neutre",
-          "date": "2026-02-08",
-          "summary": "Quelques irritants mais le client reste ouvert. Demande d'améliorations sur la signature mobile."
-        }
-      ]
-    },
-    {
-      "id": "11178856724",
-      "searchName": "avignon tourisme",
-      "displayName": "Avignon Tourisme",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11178856724",
-      "segment": "Small Account",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Neutre",
-      "lastCall": "2026-03-01",
-      "problems": [
-        "Lenteur occasionnelle"
-      ],
-      "features": [],
-      "detailTitle": "Détail des 2 derniers appels — Avignon Tourisme",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Avignon Tourisme",
-          "sentiment": "Neutre",
-          "date": "2026-03-01",
-          "summary": "Utilisation régulière sans problème majeur. Quelques lenteurs signalées ponctuellement."
-        },
-        {
-          "title": "Suivi Avignon Tourisme",
-          "sentiment": "Neutre",
-          "date": "2026-01-22",
-          "summary": "Le client est globalement satisfait. Usage basique mais efficace."
-        }
-      ]
-    },
-    {
-      "id": "34668485696",
-      "searchName": "liora (ex datascientest)",
-      "displayName": "Liora (ex DataScientest)",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/34668485696",
-      "segment": "Medium Account",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "up",
-      "trendSymbol": "↑",
-      "sentiment": "Positif",
-      "lastCall": "2026-04-08",
-      "problems": [],
-      "features": [
-        "Dashboard analytics"
-      ],
-      "detailTitle": "Détail des 3 derniers appels — Liora (ex DataScientest)",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Liora",
-          "sentiment": "Positif",
-          "date": "2026-04-08",
-          "summary": "Très bon feedback. Le client a déployé Tomorro dans toute l'organisation. Satisfaction élevée."
-        },
-        {
-          "title": "Revue Liora",
-          "sentiment": "Positif",
-          "date": "2026-03-05",
-          "summary": "Adoption exemplaire. Le client demande un dashboard analytics pour suivre l'activité contractuelle."
-        },
-        {
-          "title": "Check-in Liora",
-          "sentiment": "Neutre",
-          "date": "2026-01-30",
-          "summary": "Bonne utilisation. Quelques questions sur les fonctionnalités avancées."
-        }
-      ]
-    },
-    {
-      "id": "11176687685",
-      "searchName": "le point",
-      "displayName": "Le Point",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11176687685",
-      "segment": "Small Account",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "up",
-      "trendSymbol": "↑",
-      "sentiment": "Neutre",
-      "lastCall": "2026-03-22",
-      "problems": [
-        "Complexité perçue pour les utilisateurs non-juristes"
-      ],
-      "features": [
-        "Interface simplifiée"
-      ],
-      "detailTitle": "Détail des 3 derniers appels — Le Point",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Le Point",
-          "sentiment": "Positif",
-          "date": "2026-03-22",
-          "summary": "Amélioration notable de la satisfaction. Le client commence à voir la valeur après une phase d'adaptation."
-        },
-        {
-          "title": "Suivi Le Point",
-          "sentiment": "Neutre",
-          "date": "2026-02-14",
-          "summary": "Le client trouve l'outil encore complexe pour certains utilisateurs non-juristes."
-        },
-        {
-          "title": "Bilan Le Point",
-          "sentiment": "Neutre",
-          "date": "2026-01-08",
-          "summary": "Usage en progression. Le client demande une interface plus intuitive."
-        }
-      ]
-    },
-    {
-      "id": "11146959986",
-      "searchName": "tikamoon",
-      "displayName": "Tikamoon",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11146959986",
-      "segment": "Medium Account",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Positif",
-      "lastCall": "2026-03-15",
-      "problems": [],
-      "features": [],
-      "detailTitle": "Détail des 2 derniers appels — Tikamoon",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Tikamoon",
-          "sentiment": "Positif",
-          "date": "2026-03-15",
-          "summary": "Client fidèle et satisfait. Utilisation quotidienne de l'outil. Aucun problème remonté."
-        },
-        {
-          "title": "Suivi Tikamoon",
-          "sentiment": "Positif",
-          "date": "2026-02-01",
-          "summary": "Tout roule. Le client est un ambassadeur de Tomorro dans son réseau."
-        }
-      ]
-    },
-    {
-      "id": "11147153965",
-      "searchName": "maat pharma",
-      "displayName": "MaaT Pharma",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11147153965",
-      "segment": "Medium Account",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Positif",
-      "lastCall": "2026-03-28",
-      "problems": [],
-      "features": [
-        "Clause library étendue pour pharma"
-      ],
-      "detailTitle": "Détail des 2 derniers appels — MaaT Pharma",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point MaaT Pharma",
-          "sentiment": "Positif",
-          "date": "2026-03-28",
-          "summary": "Très bonne satisfaction. L'outil répond aux besoins spécifiques du secteur pharma. Demande d'enrichissement de la clause library."
-        },
-        {
-          "title": "Revue MaaT Pharma",
-          "sentiment": "Positif",
-          "date": "2026-02-20",
-          "summary": "Le client apprécie la conformité et la traçabilité. Bon feedback global."
-        }
-      ]
-    },
-    {
-      "id": "22123971242",
-      "searchName": "groupe eleven",
-      "displayName": "Groupe Eleven",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/22123971242",
-      "segment": "Small Account",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Neutre",
-      "lastCall": "2026-03-08",
-      "problems": [
-        "Sous-utilisation des fonctionnalités avancées"
-      ],
-      "features": [],
-      "detailTitle": "Détail des 2 derniers appels — Groupe Eleven",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Groupe Eleven",
-          "sentiment": "Neutre",
-          "date": "2026-03-08",
-          "summary": "Le client utilise l'outil de manière basique. Potentiel d'adoption plus large non exploité."
-        },
-        {
-          "title": "Suivi Groupe Eleven",
-          "sentiment": "Neutre",
-          "date": "2026-01-25",
-          "summary": "Pas de problème mais pas d'enthousiasme non plus. Le client reste sur un usage minimal."
-        }
-      ]
-    },
-    {
-      "id": "11142892876",
-      "searchName": "pharmafield groupe",
-      "displayName": "Pharmafield Groupe",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11142892876",
-      "segment": "Small Account",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Neutre",
-      "lastCall": "2026-03-18",
-      "problems": [
-        "Manque de visibilité sur le ROI"
-      ],
-      "features": [
-        "Reporting ROI"
-      ],
-      "detailTitle": "Détail des 2 derniers appels — Pharmafield Groupe",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Pharmafield",
-          "sentiment": "Neutre",
-          "date": "2026-03-18",
-          "summary": "Le client utilise l'outil correctement mais questionne le ROI. Souhaite des métriques de performance."
-        },
-        {
-          "title": "Suivi Pharmafield",
-          "sentiment": "Neutre",
-          "date": "2026-02-10",
-          "summary": "Utilisation stable. Le client aimerait un reporting plus détaillé."
-        }
-      ]
-    },
-    {
-      "id": "11143242280",
-      "searchName": "tapnation",
-      "displayName": "TapNation",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11143242280",
-      "segment": "Small Account",
-      "score": 1,
-      "scoreFilter": "1",
-      "trend": "down",
-      "trendSymbol": "↓",
-      "sentiment": "Négatif",
-      "lastCall": "2026-04-01",
-      "problems": [
-        "Fonctionnalités insuffisantes pour le gaming",
-        "Mauvaise expérience utilisateur",
-        "Lenteurs chroniques"
-      ],
-      "features": [
-        "Templates secteur gaming",
-        "Performance globale"
-      ],
-      "detailTitle": "Détail des 3 derniers appels — TapNation",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Escalade TapNation",
-          "sentiment": "Négatif",
-          "date": "2026-04-01",
-          "summary": "Client très mécontent. L'outil ne correspond pas aux besoins spécifiques du secteur gaming. Envisage des alternatives."
-        },
-        {
-          "title": "Point TapNation",
-          "sentiment": "Négatif",
-          "date": "2026-03-10",
-          "summary": "Remontées multiples : lenteurs, UX insuffisante, manque de templates adaptés."
-        },
-        {
-          "title": "Suivi TapNation",
-          "sentiment": "Neutre",
-          "date": "2026-02-05",
-          "summary": "Le client exprime des réserves mais reste en discussion."
-        }
-      ]
-    },
-    {
-      "id": "11141446818",
-      "searchName": "heroiks",
-      "displayName": "HEROIKS",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11141446818",
-      "segment": "Small Account",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Neutre",
-      "lastCall": "2026-03-20",
-      "problems": [
-        "Formation insuffisante des équipes"
-      ],
-      "features": [
-        "Onboarding amélioré"
-      ],
-      "detailTitle": "Détail des 2 derniers appels — HEROIKS",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point HEROIKS",
-          "sentiment": "Neutre",
-          "date": "2026-03-20",
-          "summary": "Le client est neutre. L'adoption progresse lentement. Besoin d'un meilleur accompagnement à l'onboarding."
-        },
-        {
-          "title": "Suivi HEROIKS",
-          "sentiment": "Neutre",
-          "date": "2026-02-12",
-          "summary": "Utilisation en cours de déploiement. Pas de problème majeur mais pas d'enthousiasme."
-        }
-      ]
-    },
-    {
-      "id": "10574668345",
-      "searchName": "yogosha",
-      "displayName": "Yogosha",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/10574668345",
-      "segment": "Medium Account",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Positif",
-      "lastCall": "2026-03-25",
-      "problems": [],
-      "features": [],
-      "detailTitle": "Détail des 2 derniers appels — Yogosha",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Yogosha",
-          "sentiment": "Positif",
-          "date": "2026-03-25",
-          "summary": "Client très satisfait. L'outil est parfaitement intégré dans leur workflow. Aucune friction."
-        },
-        {
-          "title": "Suivi Yogosha",
-          "sentiment": "Positif",
-          "date": "2026-02-15",
-          "summary": "Adoption complète. Le client salue la qualité du produit et du support."
-        }
-      ]
-    },
-    {
-      "id": "10485002793",
-      "searchName": "stade toulousain rugby",
-      "displayName": "Stade Toulousain Rugby",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/10485002793",
-      "segment": "Medium Account",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "stable",
-      "trendSymbol": "→",
-      "sentiment": "Positif",
-      "lastCall": "2026-03-30",
-      "problems": [],
-      "features": [],
-      "detailTitle": "Détail des 2 derniers appels — Stade Toulousain Rugby",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Stade Toulousain",
-          "sentiment": "Positif",
-          "date": "2026-03-30",
-          "summary": "Très bon retour. Le club utilise Tomorro pour tous ses contrats partenaires. Grande satisfaction."
-        },
-        {
-          "title": "Suivi Stade Toulousain",
-          "sentiment": "Positif",
-          "date": "2026-02-22",
-          "summary": "Utilisation exemplaire. Le client est un promoteur actif de Tomorro."
-        }
-      ]
-    },
-    {
-      "id": "48178785178",
-      "searchName": "pasqal",
-      "displayName": "Pasqal",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/48178785178",
-      "segment": "Key Account",
-      "score": 2,
-      "scoreFilter": "2",
-      "trend": "down",
-      "trendSymbol": "↓",
-      "sentiment": "Neutre",
-      "lastCall": "2026-04-10",
-      "problems": [
-        "Complexité des workflows multi-approbateurs",
-        "Temps de chargement"
-      ],
-      "features": [
-        "Workflow d'approbation simplifié",
-        "Performance"
-      ],
-      "detailTitle": "Détail des 3 derniers appels — Pasqal",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Point Pasqal",
-          "sentiment": "Neutre",
-          "date": "2026-04-10",
-          "summary": "Le client remonte des difficultés avec les workflows multi-approbateurs. Certaines lenteurs de chargement."
-        },
-        {
-          "title": "Revue Pasqal",
-          "sentiment": "Positif",
-          "date": "2026-03-12",
-          "summary": "Globalement positif mais quelques points d'attention sur la complexité des workflows."
-        },
-        {
-          "title": "Suivi Pasqal",
-          "sentiment": "Positif",
-          "date": "2026-02-08",
-          "summary": "Bonne satisfaction. Le client envisage d'étendre l'usage."
-        }
-      ]
-    },
-    {
-      "id": "10433846553",
-      "searchName": "inside",
-      "displayName": "Inside",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/10433846553",
-      "segment": "Small Account",
-      "score": 1,
-      "scoreFilter": "1",
-      "trend": "down",
-      "trendSymbol": "↓",
-      "sentiment": "Négatif",
-      "lastCall": "2026-04-12",
-      "problems": [
-        "Bugs bloquants sur la signature",
-        "Support non réactif",
-        "Perte de documents signalée"
-      ],
-      "features": [
-        "Fiabilité signature",
-        "Sauvegarde automatique"
-      ],
-      "detailTitle": "Détail des 4 derniers appels — Inside",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Escalade Inside",
-          "sentiment": "Négatif",
-          "date": "2026-04-12",
-          "summary": "Situation critique. Le client a perdu un document important. Bug bloquant sur la signature. Menace de résiliation."
-        },
-        {
-          "title": "Point Inside",
-          "sentiment": "Négatif",
-          "date": "2026-03-20",
-          "summary": "Client très frustré. Multiples bugs remontés sans résolution. Le support est jugé trop lent."
-        },
-        {
-          "title": "Suivi Inside",
-          "sentiment": "Négatif",
-          "date": "2026-02-25",
-          "summary": "Problèmes de fiabilité persistants. Le client perd confiance."
-        },
-        {
-          "title": "Check-in Inside",
-          "sentiment": "Neutre",
-          "date": "2026-01-18",
-          "summary": "Premiers signaux de mécontentement. Le client remonte quelques bugs."
-        }
-      ]
-    },
-    {
-      "id": "10256489519",
-      "searchName": "mf brands group",
-      "displayName": "MF BRANDS GROUP",
-      "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/10256489519",
-      "segment": "Enterprise",
-      "score": 3,
-      "scoreFilter": "3",
-      "trend": "up",
-      "trendSymbol": "↑",
-      "sentiment": "Positif",
-      "lastCall": "2026-04-05",
-      "problems": [],
-      "features": [
-        "Connecteur ERP"
-      ],
-      "detailTitle": "Détail des 3 derniers appels — MF BRANDS GROUP",
-      "emptyMessage": null,
-      "calls": [
-        {
-          "title": "Revue MF BRANDS GROUP",
-          "sentiment": "Positif",
-          "date": "2026-04-05",
-          "summary": "Excellent bilan. Le client est très satisfait et envisage d'intégrer Tomorro avec leur ERP."
-        },
-        {
-          "title": "Point MF BRANDS GROUP",
-          "sentiment": "Positif",
-          "date": "2026-03-10",
-          "summary": "Adoption massive dans le groupe. Feedback très positif des différentes marques."
-        },
-        {
-          "title": "Suivi MF BRANDS GROUP",
-          "sentiment": "Neutre",
-          "date": "2026-02-05",
-          "summary": "Bonne progression. Le client pose des questions sur les intégrations futures."
-        }
-      ]
-    }
-  ]
-}
+  {
+    "id": "40695694084",
+    "searchName": "ozi sas",
+    "displayName": "Ozi SAS",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/40695694084",
+    "segment": "Medium Account",
+    "score": null,
+    "scoreFilter": "na",
+    "trend": "stable",
+    "trendSymbol": "—",
+    "sentiment": "—",
+    "lastCall": null,
+    "problems": [],
+    "features": [],
+    "detailTitle": "Ozi SAS",
+    "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
+    "calls": []
+  },
+  {
+    "id": "35599744087",
+    "searchName": "kalhyge",
+    "displayName": "Kalhyge",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/35599744087",
+    "segment": "Small Account",
+    "score": null,
+    "scoreFilter": "na",
+    "trend": "stable",
+    "trendSymbol": "—",
+    "sentiment": "—",
+    "lastCall": null,
+    "problems": [],
+    "features": [],
+    "detailTitle": "Kalhyge",
+    "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
+    "calls": []
+  },
+  {
+    "id": "35251683353",
+    "searchName": "vertone rh",
+    "displayName": "Vertone RH",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/35251683353",
+    "segment": "Small Account",
+    "score": null,
+    "scoreFilter": "na",
+    "trend": "stable",
+    "trendSymbol": "—",
+    "sentiment": "—",
+    "lastCall": null,
+    "problems": [],
+    "features": [],
+    "detailTitle": "Vertone RH",
+    "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
+    "calls": []
+  },
+  {
+    "id": "34261862152",
+    "searchName": "gl events rh",
+    "displayName": "GL Events RH",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/34261862152",
+    "segment": "Enterprise",
+    "score": 1,
+    "scoreFilter": "1",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Négatif",
+    "lastCall": "2026-03-25",
+    "problems": [
+      "Problèmes récurrents d'intégration",
+      "Lenteurs signalées sur l'éditeur",
+      "Manque de support réactif"
+    ],
+    "features": ["Intégration SIRH améliorée", "Performance éditeur"],
+    "detailTitle": "Détail des 4 derniers appels — GL Events RH",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Escalade GL Events RH",
+        "sentiment": "Négatif",
+        "date": "2026-03-25",
+        "summary": "Client frustré par des bugs récurrents sur l'intégration SIRH. Menace de réévaluer l'outil si pas d'amélioration rapide."
+      },
+      {
+        "title": "Point GL Events RH",
+        "sentiment": "Négatif",
+        "date": "2026-03-05",
+        "summary": "Remontée de lenteurs sur l'éditeur de contrats. Le client exprime son mécontentement sur le temps de résolution des tickets."
+      },
+      {
+        "title": "Suivi GL Events RH",
+        "sentiment": "Négatif",
+        "date": "2026-02-10",
+        "summary": "Problèmes d'intégration toujours non résolus. Le client est très mécontent."
+      },
+      {
+        "title": "Bilan GL Events RH",
+        "sentiment": "Neutre",
+        "date": "2026-01-20",
+        "summary": "Discussion sur les axes d'amélioration. Le client reste prudent mais ouvert."
+      }
+    ]
+  },
+  {
+    "id": "34245827142",
+    "searchName": "panda",
+    "displayName": "Panda",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/34245827142",
+    "segment": "Small Account",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Neutre",
+    "lastCall": "2026-03-10",
+    "problems": ["Quelques difficultés d'adoption par les équipes"],
+    "features": ["Modèles de contrats plus flexibles"],
+    "detailTitle": "Détail des 2 derniers appels — Panda",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Panda/WWF",
+        "sentiment": "Neutre",
+        "date": "2026-03-10",
+        "summary": "Utilisation stable mais limitée. Le client souhaite plus de modèles de contrats adaptés à leur secteur."
+      },
+      {
+        "title": "Suivi Panda",
+        "sentiment": "Neutre",
+        "date": "2026-01-28",
+        "summary": "Pas de problème majeur. Adoption encore partielle au sein des équipes."
+      }
+    ]
+  },
+  {
+    "id": "34259224328",
+    "searchName": "rémy cointreau - cep",
+    "displayName": "Rémy Cointreau - CEP",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/34259224328",
+    "segment": "Enterprise",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Neutre",
+    "lastCall": "2026-03-20",
+    "problems": [
+      "Complexité de configuration pour les contrats internationaux"
+    ],
+    "features": [
+      "Support multi-langue amélioré",
+      "Gestion des entités juridiques"
+    ],
+    "detailTitle": "Détail des 3 derniers appels — Rémy Cointreau - CEP",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Revue Rémy Cointreau",
+        "sentiment": "Neutre",
+        "date": "2026-03-20",
+        "summary": "Le client utilise bien la plateforme mais remonte la complexité pour les contrats multi-entités internationaux."
+      },
+      {
+        "title": "Point Rémy Cointreau",
+        "sentiment": "Positif",
+        "date": "2026-02-15",
+        "summary": "Bonne satisfaction globale. Quelques demandes d'évolution sur le multi-langue."
+      },
+      {
+        "title": "Check-in Rémy Cointreau",
+        "sentiment": "Neutre",
+        "date": "2026-01-10",
+        "summary": "Utilisation régulière. Le client attend des améliorations sur la gestion des entités juridiques."
+      }
+    ]
+  },
+  {
+    "id": "33827234094",
+    "searchName": "drama paris",
+    "displayName": "Drama Paris",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/33827234094",
+    "segment": "Medium Account",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "up",
+    "trendSymbol": "↑",
+    "sentiment": "Positif",
+    "lastCall": "2026-04-02",
+    "problems": [],
+    "features": [],
+    "detailTitle": "Détail des 3 derniers appels — Drama Paris",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Drama Paris",
+        "sentiment": "Positif",
+        "date": "2026-04-02",
+        "summary": "Excellent retour. Le client est très enthousiaste sur les gains de temps réalisés grâce à Tomorro."
+      },
+      {
+        "title": "Suivi Drama Paris",
+        "sentiment": "Positif",
+        "date": "2026-02-20",
+        "summary": "Adoption complète par les équipes. Le client envisage d'étendre l'usage à d'autres départements."
+      },
+      {
+        "title": "Bilan Drama Paris",
+        "sentiment": "Neutre",
+        "date": "2026-01-05",
+        "summary": "Bon bilan de fin d'année. Quelques ajustements demandés mais rien de bloquant."
+      }
+    ]
+  },
+  {
+    "id": "33695278612",
+    "searchName": "infopro digital rh",
+    "displayName": "Infopro Digital RH",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/33695278612",
+    "segment": "Strategic Account",
+    "score": null,
+    "scoreFilter": "na",
+    "trend": "stable",
+    "trendSymbol": "—",
+    "sentiment": "—",
+    "lastCall": null,
+    "problems": [],
+    "features": [],
+    "detailTitle": "Infopro Digital RH",
+    "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
+    "calls": []
+  },
+  {
+    "id": "50095592233",
+    "searchName": "enix",
+    "displayName": "Enix",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/50095592233",
+    "segment": "Small Account",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Positif",
+    "lastCall": "2026-03-28",
+    "problems": [],
+    "features": ["API d'export"],
+    "detailTitle": "Détail des 2 derniers appels — Enix",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Enix",
+        "sentiment": "Positif",
+        "date": "2026-03-28",
+        "summary": "Le client est satisfait. Utilisation fluide et régulière. Demande mineure sur l'API d'export."
+      },
+      {
+        "title": "Suivi Enix",
+        "sentiment": "Positif",
+        "date": "2026-02-18",
+        "summary": "Tout fonctionne bien. Le client apprécie la simplicité de l'outil."
+      }
+    ]
+  },
+  {
+    "id": "25976217869",
+    "searchName": "habitation batiment",
+    "displayName": "Habitation Batiment",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/25976217869",
+    "segment": "Medium Account",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Neutre",
+    "lastCall": "2026-03-12",
+    "problems": ["Difficulté à former les nouveaux arrivants"],
+    "features": ["Tutoriels intégrés", "Parcours d'onboarding utilisateur"],
+    "detailTitle": "Détail des 2 derniers appels — Habitation Batiment",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Habitation Batiment",
+        "sentiment": "Neutre",
+        "date": "2026-03-12",
+        "summary": "Le client remonte des difficultés pour former les nouveaux utilisateurs. Souhaite des tutoriels intégrés."
+      },
+      {
+        "title": "Suivi Habitation Batiment",
+        "sentiment": "Neutre",
+        "date": "2026-02-05",
+        "summary": "Utilisation correcte mais pas optimale. Le client aimerait un meilleur onboarding pour ses équipes."
+      }
+    ]
+  },
+  {
+    "id": "42606417725",
+    "searchName": "gp explorer",
+    "displayName": "GP Explorer",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/42606417725",
+    "segment": "Small Account",
+    "score": null,
+    "scoreFilter": "na",
+    "trend": "stable",
+    "trendSymbol": "—",
+    "sentiment": "—",
+    "lastCall": null,
+    "problems": [],
+    "features": [],
+    "detailTitle": "GP Explorer",
+    "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
+    "calls": []
+  },
+  {
+    "id": "25089959216",
+    "searchName": "pousse",
+    "displayName": "POUSSE",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/25089959216",
+    "segment": "Small Account",
+    "score": 1,
+    "scoreFilter": "1",
+    "trend": "down",
+    "trendSymbol": "↓",
+    "sentiment": "Négatif",
+    "lastCall": "2026-04-05",
+    "problems": [
+      "Bugs fréquents sur la signature électronique",
+      "Temps de réponse support trop long",
+      "Fonctionnalités manquantes vs concurrent"
+    ],
+    "features": ["Signature mobile", "Rappels automatiques"],
+    "detailTitle": "Détail des 3 derniers appels — POUSSE",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Escalade POUSSE",
+        "sentiment": "Négatif",
+        "date": "2026-04-05",
+        "summary": "Le client menace de churner. Bugs récurrents sur la signature électronique. Très insatisfait du support."
+      },
+      {
+        "title": "Point POUSSE",
+        "sentiment": "Négatif",
+        "date": "2026-03-15",
+        "summary": "Nouvelles remontées de bugs. Le client compare défavorablement Tomorro à un concurrent."
+      },
+      {
+        "title": "Suivi POUSSE",
+        "sentiment": "Neutre",
+        "date": "2026-02-08",
+        "summary": "Quelques irritants mais le client reste ouvert. Demande d'améliorations sur la signature mobile."
+      }
+    ]
+  },
+  {
+    "id": "11178856724",
+    "searchName": "avignon tourisme",
+    "displayName": "Avignon Tourisme",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11178856724",
+    "segment": "Small Account",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Neutre",
+    "lastCall": "2026-03-01",
+    "problems": ["Lenteur occasionnelle"],
+    "features": [],
+    "detailTitle": "Détail des 2 derniers appels — Avignon Tourisme",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Avignon Tourisme",
+        "sentiment": "Neutre",
+        "date": "2026-03-01",
+        "summary": "Utilisation régulière sans problème majeur. Quelques lenteurs signalées ponctuellement."
+      },
+      {
+        "title": "Suivi Avignon Tourisme",
+        "sentiment": "Neutre",
+        "date": "2026-01-22",
+        "summary": "Le client est globalement satisfait. Usage basique mais efficace."
+      }
+    ]
+  },
+  {
+    "id": "34668485696",
+    "searchName": "liora (ex datascientest)",
+    "displayName": "Liora (ex DataScientest)",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/34668485696",
+    "segment": "Medium Account",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "up",
+    "trendSymbol": "↑",
+    "sentiment": "Positif",
+    "lastCall": "2026-04-08",
+    "problems": [],
+    "features": ["Dashboard analytics"],
+    "detailTitle": "Détail des 3 derniers appels — Liora (ex DataScientest)",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Liora",
+        "sentiment": "Positif",
+        "date": "2026-04-08",
+        "summary": "Très bon feedback. Le client a déployé Tomorro dans toute l'organisation. Satisfaction élevée."
+      },
+      {
+        "title": "Revue Liora",
+        "sentiment": "Positif",
+        "date": "2026-03-05",
+        "summary": "Adoption exemplaire. Le client demande un dashboard analytics pour suivre l'activité contractuelle."
+      },
+      {
+        "title": "Check-in Liora",
+        "sentiment": "Neutre",
+        "date": "2026-01-30",
+        "summary": "Bonne utilisation. Quelques questions sur les fonctionnalités avancées."
+      }
+    ]
+  },
+  {
+    "id": "11176687685",
+    "searchName": "le point",
+    "displayName": "Le Point",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11176687685",
+    "segment": "Small Account",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "up",
+    "trendSymbol": "↑",
+    "sentiment": "Neutre",
+    "lastCall": "2026-03-22",
+    "problems": ["Complexité perçue pour les utilisateurs non-juristes"],
+    "features": ["Interface simplifiée"],
+    "detailTitle": "Détail des 3 derniers appels — Le Point",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Le Point",
+        "sentiment": "Positif",
+        "date": "2026-03-22",
+        "summary": "Amélioration notable de la satisfaction. Le client commence à voir la valeur après une phase d'adaptation."
+      },
+      {
+        "title": "Suivi Le Point",
+        "sentiment": "Neutre",
+        "date": "2026-02-14",
+        "summary": "Le client trouve l'outil encore complexe pour certains utilisateurs non-juristes."
+      },
+      {
+        "title": "Bilan Le Point",
+        "sentiment": "Neutre",
+        "date": "2026-01-08",
+        "summary": "Usage en progression. Le client demande une interface plus intuitive."
+      }
+    ]
+  },
+  {
+    "id": "11146959986",
+    "searchName": "tikamoon",
+    "displayName": "Tikamoon",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11146959986",
+    "segment": "Medium Account",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Positif",
+    "lastCall": "2026-03-15",
+    "problems": [],
+    "features": [],
+    "detailTitle": "Détail des 2 derniers appels — Tikamoon",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Tikamoon",
+        "sentiment": "Positif",
+        "date": "2026-03-15",
+        "summary": "Client fidèle et satisfait. Utilisation quotidienne de l'outil. Aucun problème remonté."
+      },
+      {
+        "title": "Suivi Tikamoon",
+        "sentiment": "Positif",
+        "date": "2026-02-01",
+        "summary": "Tout roule. Le client est un ambassadeur de Tomorro dans son réseau."
+      }
+    ]
+  },
+  {
+    "id": "11147153965",
+    "searchName": "maat pharma",
+    "displayName": "MaaT Pharma",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11147153965",
+    "segment": "Medium Account",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Positif",
+    "lastCall": "2026-03-28",
+    "problems": [],
+    "features": ["Clause library étendue pour pharma"],
+    "detailTitle": "Détail des 2 derniers appels — MaaT Pharma",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point MaaT Pharma",
+        "sentiment": "Positif",
+        "date": "2026-03-28",
+        "summary": "Très bonne satisfaction. L'outil répond aux besoins spécifiques du secteur pharma. Demande d'enrichissement de la clause library."
+      },
+      {
+        "title": "Revue MaaT Pharma",
+        "sentiment": "Positif",
+        "date": "2026-02-20",
+        "summary": "Le client apprécie la conformité et la traçabilité. Bon feedback global."
+      }
+    ]
+  },
+  {
+    "id": "22123971242",
+    "searchName": "groupe eleven",
+    "displayName": "Groupe Eleven",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/22123971242",
+    "segment": "Small Account",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Neutre",
+    "lastCall": "2026-03-08",
+    "problems": ["Sous-utilisation des fonctionnalités avancées"],
+    "features": [],
+    "detailTitle": "Détail des 2 derniers appels — Groupe Eleven",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Groupe Eleven",
+        "sentiment": "Neutre",
+        "date": "2026-03-08",
+        "summary": "Le client utilise l'outil de manière basique. Potentiel d'adoption plus large non exploité."
+      },
+      {
+        "title": "Suivi Groupe Eleven",
+        "sentiment": "Neutre",
+        "date": "2026-01-25",
+        "summary": "Pas de problème mais pas d'enthousiasme non plus. Le client reste sur un usage minimal."
+      }
+    ]
+  },
+  {
+    "id": "11142892876",
+    "searchName": "pharmafield groupe",
+    "displayName": "Pharmafield Groupe",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11142892876",
+    "segment": "Small Account",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Neutre",
+    "lastCall": "2026-03-18",
+    "problems": ["Manque de visibilité sur le ROI"],
+    "features": ["Reporting ROI"],
+    "detailTitle": "Détail des 2 derniers appels — Pharmafield Groupe",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Pharmafield",
+        "sentiment": "Neutre",
+        "date": "2026-03-18",
+        "summary": "Le client utilise l'outil correctement mais questionne le ROI. Souhaite des métriques de performance."
+      },
+      {
+        "title": "Suivi Pharmafield",
+        "sentiment": "Neutre",
+        "date": "2026-02-10",
+        "summary": "Utilisation stable. Le client aimerait un reporting plus détaillé."
+      }
+    ]
+  },
+  {
+    "id": "11143242280",
+    "searchName": "tapnation",
+    "displayName": "TapNation",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11143242280",
+    "segment": "Small Account",
+    "score": 1,
+    "scoreFilter": "1",
+    "trend": "down",
+    "trendSymbol": "↓",
+    "sentiment": "Négatif",
+    "lastCall": "2026-04-01",
+    "problems": [
+      "Fonctionnalités insuffisantes pour le gaming",
+      "Mauvaise expérience utilisateur",
+      "Lenteurs chroniques"
+    ],
+    "features": ["Templates secteur gaming", "Performance globale"],
+    "detailTitle": "Détail des 3 derniers appels — TapNation",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Escalade TapNation",
+        "sentiment": "Négatif",
+        "date": "2026-04-01",
+        "summary": "Client très mécontent. L'outil ne correspond pas aux besoins spécifiques du secteur gaming. Envisage des alternatives."
+      },
+      {
+        "title": "Point TapNation",
+        "sentiment": "Négatif",
+        "date": "2026-03-10",
+        "summary": "Remontées multiples : lenteurs, UX insuffisante, manque de templates adaptés."
+      },
+      {
+        "title": "Suivi TapNation",
+        "sentiment": "Neutre",
+        "date": "2026-02-05",
+        "summary": "Le client exprime des réserves mais reste en discussion."
+      }
+    ]
+  },
+  {
+    "id": "11141446818",
+    "searchName": "heroiks",
+    "displayName": "HEROIKS",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/11141446818",
+    "segment": "Small Account",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Neutre",
+    "lastCall": "2026-03-20",
+    "problems": ["Formation insuffisante des équipes"],
+    "features": ["Onboarding amélioré"],
+    "detailTitle": "Détail des 2 derniers appels — HEROIKS",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point HEROIKS",
+        "sentiment": "Neutre",
+        "date": "2026-03-20",
+        "summary": "Le client est neutre. L'adoption progresse lentement. Besoin d'un meilleur accompagnement à l'onboarding."
+      },
+      {
+        "title": "Suivi HEROIKS",
+        "sentiment": "Neutre",
+        "date": "2026-02-12",
+        "summary": "Utilisation en cours de déploiement. Pas de problème majeur mais pas d'enthousiasme."
+      }
+    ]
+  },
+  {
+    "id": "10574668345",
+    "searchName": "yogosha",
+    "displayName": "Yogosha",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/10574668345",
+    "segment": "Medium Account",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Positif",
+    "lastCall": "2026-03-25",
+    "problems": [],
+    "features": [],
+    "detailTitle": "Détail des 2 derniers appels — Yogosha",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Yogosha",
+        "sentiment": "Positif",
+        "date": "2026-03-25",
+        "summary": "Client très satisfait. L'outil est parfaitement intégré dans leur workflow. Aucune friction."
+      },
+      {
+        "title": "Suivi Yogosha",
+        "sentiment": "Positif",
+        "date": "2026-02-15",
+        "summary": "Adoption complète. Le client salue la qualité du produit et du support."
+      }
+    ]
+  },
+  {
+    "id": "10485002793",
+    "searchName": "stade toulousain rugby",
+    "displayName": "Stade Toulousain Rugby",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/10485002793",
+    "segment": "Medium Account",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "stable",
+    "trendSymbol": "→",
+    "sentiment": "Positif",
+    "lastCall": "2026-03-30",
+    "problems": [],
+    "features": [],
+    "detailTitle": "Détail des 2 derniers appels — Stade Toulousain Rugby",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Stade Toulousain",
+        "sentiment": "Positif",
+        "date": "2026-03-30",
+        "summary": "Très bon retour. Le club utilise Tomorro pour tous ses contrats partenaires. Grande satisfaction."
+      },
+      {
+        "title": "Suivi Stade Toulousain",
+        "sentiment": "Positif",
+        "date": "2026-02-22",
+        "summary": "Utilisation exemplaire. Le client est un promoteur actif de Tomorro."
+      }
+    ]
+  },
+  {
+    "id": "48178785178",
+    "searchName": "pasqal",
+    "displayName": "Pasqal",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/48178785178",
+    "segment": "Key Account",
+    "score": 2,
+    "scoreFilter": "2",
+    "trend": "down",
+    "trendSymbol": "↓",
+    "sentiment": "Neutre",
+    "lastCall": "2026-04-10",
+    "problems": [
+      "Complexité des workflows multi-approbateurs",
+      "Temps de chargement"
+    ],
+    "features": ["Workflow d'approbation simplifié", "Performance"],
+    "detailTitle": "Détail des 3 derniers appels — Pasqal",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Point Pasqal",
+        "sentiment": "Neutre",
+        "date": "2026-04-10",
+        "summary": "Le client remonte des difficultés avec les workflows multi-approbateurs. Certaines lenteurs de chargement."
+      },
+      {
+        "title": "Revue Pasqal",
+        "sentiment": "Positif",
+        "date": "2026-03-12",
+        "summary": "Globalement positif mais quelques points d'attention sur la complexité des workflows."
+      },
+      {
+        "title": "Suivi Pasqal",
+        "sentiment": "Positif",
+        "date": "2026-02-08",
+        "summary": "Bonne satisfaction. Le client envisage d'étendre l'usage."
+      }
+    ]
+  },
+  {
+    "id": "10433846553",
+    "searchName": "inside",
+    "displayName": "Inside",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/10433846553",
+    "segment": "Small Account",
+    "score": 1,
+    "scoreFilter": "1",
+    "trend": "down",
+    "trendSymbol": "↓",
+    "sentiment": "Négatif",
+    "lastCall": "2026-04-12",
+    "problems": [
+      "Bugs bloquants sur la signature",
+      "Support non réactif",
+      "Perte de documents signalée"
+    ],
+    "features": ["Fiabilité signature", "Sauvegarde automatique"],
+    "detailTitle": "Détail des 4 derniers appels — Inside",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Escalade Inside",
+        "sentiment": "Négatif",
+        "date": "2026-04-12",
+        "summary": "Situation critique. Le client a perdu un document important. Bug bloquant sur la signature. Menace de résiliation."
+      },
+      {
+        "title": "Point Inside",
+        "sentiment": "Négatif",
+        "date": "2026-03-20",
+        "summary": "Client très frustré. Multiples bugs remontés sans résolution. Le support est jugé trop lent."
+      },
+      {
+        "title": "Suivi Inside",
+        "sentiment": "Négatif",
+        "date": "2026-02-25",
+        "summary": "Problèmes de fiabilité persistants. Le client perd confiance."
+      },
+      {
+        "title": "Check-in Inside",
+        "sentiment": "Neutre",
+        "date": "2026-01-18",
+        "summary": "Premiers signaux de mécontentement. Le client remonte quelques bugs."
+      }
+    ]
+  },
+  {
+    "id": "10256489519",
+    "searchName": "mf brands group",
+    "displayName": "MF BRANDS GROUP",
+    "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/10256489519",
+    "segment": "Enterprise",
+    "score": 3,
+    "scoreFilter": "3",
+    "trend": "up",
+    "trendSymbol": "↑",
+    "sentiment": "Positif",
+    "lastCall": "2026-04-05",
+    "problems": [],
+    "features": ["Connecteur ERP"],
+    "detailTitle": "Détail des 3 derniers appels — MF BRANDS GROUP",
+    "emptyMessage": null,
+    "calls": [
+      {
+        "title": "Revue MF BRANDS GROUP",
+        "sentiment": "Positif",
+        "date": "2026-04-05",
+        "summary": "Excellent bilan. Le client est très satisfait et envisage d'intégrer Tomorro avec leur ERP."
+      },
+      {
+        "title": "Point MF BRANDS GROUP",
+        "sentiment": "Positif",
+        "date": "2026-03-10",
+        "summary": "Adoption massive dans le groupe. Feedback très positif des différentes marques."
+      },
+      {
+        "title": "Suivi MF BRANDS GROUP",
+        "sentiment": "Neutre",
+        "date": "2026-02-05",
+        "summary": "Bonne progression. Le client pose des questions sur les intégrations futures."
+      }
+    ]
+  }
+]

@@ -2,6 +2,7 @@
 
 import { Fragment, useCallback, useMemo, useState } from "react"
 
+import { useDashboard } from "@/components/sentiment/dashboard-context"
 import { SentimentKpiGrid } from "@/components/sentiment/sentiment-kpi-grid"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -22,8 +23,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { DASHBOARD_META } from "@/lib/dashboard-meta"
 import { cn } from "@/lib/utils"
-import type { DashboardClient, DashboardData } from "@/types/dashboard"
+import type { DashboardClient } from "@/types/dashboard"
 
 type SortCol = 0 | 1 | 2 | 5
 
@@ -88,10 +90,19 @@ function compareClients(
   return 0
 }
 
-export function SentimentDashboard({ data }: { data: DashboardData }) {
-  const [search, setSearch] = useState("")
-  const [scoreFilter, setScoreFilter] = useState<string>("all")
-  const [segmentFilter, setSegmentFilter] = useState<string>("all")
+export function SentimentDashboard() {
+  const {
+    clients,
+    kpis,
+    search,
+    setSearch,
+    scoreFilter,
+    setScoreFilter,
+    segmentFilter,
+    setSegmentFilter,
+    segmentOptions,
+    scoreOptions,
+  } = useDashboard()
   const [sort, setSort] = useState<{ col: SortCol; asc: boolean } | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
@@ -106,7 +117,7 @@ export function SentimentDashboard({ data }: { data: DashboardData }) {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return data.clients.filter((c) => {
+    return clients.filter((c) => {
       const matchSearch =
         !q ||
         c.searchName.toLowerCase().includes(q) ||
@@ -117,7 +128,7 @@ export function SentimentDashboard({ data }: { data: DashboardData }) {
         segmentFilter === "all" || c.segment === segmentFilter
       return matchSearch && matchScore && matchSegment
     })
-  }, [data.clients, search, scoreFilter, segmentFilter])
+  }, [clients, search, scoreFilter, segmentFilter])
 
   const visibleClients = useMemo(() => {
     if (!sort) return filtered
@@ -172,12 +183,14 @@ export function SentimentDashboard({ data }: { data: DashboardData }) {
       <div className="mx-auto max-w-[1400px] px-6 py-6">
         <header className="mb-8 border-b border-border pb-6 text-center">
           <h1 className="mb-2 text-[28px] font-semibold text-foreground">
-            {data.meta.title}
+            {DASHBOARD_META.title}
           </h1>
-          <p className="text-sm text-muted-foreground">{data.meta.subtitle}</p>
+          <p className="text-sm text-muted-foreground">
+            {DASHBOARD_META.subtitle}
+          </p>
         </header>
 
-        <SentimentKpiGrid kpis={data.kpis} />
+        <SentimentKpiGrid kpis={kpis} />
 
         <div className="mb-5 flex flex-wrap items-center gap-3">
           <Input
@@ -191,7 +204,7 @@ export function SentimentDashboard({ data }: { data: DashboardData }) {
               <SelectValue placeholder="Score" />
             </SelectTrigger>
             <SelectContent>
-              {data.filters.scoreOptions.map((o) => (
+              {scoreOptions.map((o) => (
                 <SelectItem key={o.value} value={o.value}>
                   {o.label}
                 </SelectItem>
@@ -203,7 +216,7 @@ export function SentimentDashboard({ data }: { data: DashboardData }) {
               <SelectValue placeholder="Segment" />
             </SelectTrigger>
             <SelectContent>
-              {data.filters.segments.map((s) => (
+              {segmentOptions.map((s) => (
                 <SelectItem key={s.value} value={s.value}>
                   {s.label}
                 </SelectItem>
@@ -408,7 +421,7 @@ export function SentimentDashboard({ data }: { data: DashboardData }) {
         </Card>
 
         <footer className="py-8 text-center text-xs text-muted-foreground">
-          {data.meta.footer}
+          {DASHBOARD_META.footer}
         </footer>
       </div>
     </div>
