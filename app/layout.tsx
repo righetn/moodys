@@ -14,10 +14,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Tomorro — Customer Sentiment",
-    template: "%s · Tomorro",
+    default: "Moody's — Customer mood",
+    template: "%s · Moody's",
   },
-  description: "Tableau de bord sentiment client",
+  description: "Customer mood dashboard · HubSpot × Modjo",
 };
 
 export default function RootLayout({
@@ -27,10 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="fr"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col bg-muted/30">{children}</body>
     </html>
   );
 }

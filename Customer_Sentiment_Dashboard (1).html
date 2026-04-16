@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moody's — Customer Mood Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --green:   #22c55e; --green-bg:   #f0fdf4; --green-dim:  #dcfce7;
+      --amber:   #f59e0b; --amber-bg:   #fffbeb; --amber-dim:  #fef3c7;
+      --red:     #ef4444; --red-bg:     #fef2f2; --red-dim:    #fee2e2;
+      --gray:    #94a3b8; --gray-bg:    #f8fafc; --gray-dim:   #f1f5f9;
+      --blue:    #3b82f6;
+      --ink:     #0f172a;
+      --ink2:    #334155;
+      --muted:   #64748b;
+      --border:  #e2e8f0;
+      --bg:      #f1f5f9;
+      --card:    #ffffff;
+      --radius:  12px;
+      --shadow:  0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+      --shadow-hover: 0 4px 12px rgba(0,0,0,.1), 0 12px 32px rgba(0,0,0,.06);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); min-height:100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Wrapper ── */
+    .pw { max-width: 1480px; margin: 0 auto; padding: 0 28px 40px; }
+
+    /* ══════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════ */
+    .hdr {
+      display: flex; align-items: center; gap: 20px;
+      padding: 20px 0 18px; margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hdr-logo img { height: 34px; width: auto; display: block; }
+    .hdr-sep { width:1px; height:30px; background:var(--border); flex-shrink:0; }
+    .hdr-text { flex:1; }
+    .hdr-title { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing:-.3px; }
+    .hdr-sub { font-size: 11px; color: var(--muted); margin-top:2px; }
+    .hdr-pills { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+    .src-pill {
+      font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+      border: 1px solid var(--border); color: var(--muted); background: var(--card);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .src-pill span { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .src-pill.hs span   { background:#ff7a59; }
+    .src-pill.modjo span{ background:#7c3aed; }
+
+    /* ══════════════════════════════════════
+       KPI GRID
+    ══════════════════════════════════════ */
+    .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
+    .kpi-card {
+      background: var(--card); border-radius: var(--radius); padding: 16px 18px;
+      border: 1.5px solid var(--border); cursor: pointer;
+      transition: border-color .18s, box-shadow .18s, transform .15s;
+      position: relative; overflow: hidden;
+    }
+    .kpi-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background: var(--border); transition: background .18s;
+    }
+    .kpi-card.excellent::before { background: var(--green); }
+    .kpi-card.neutre::before    { background: var(--amber); }
+    .kpi-card.alert::before     { background: var(--red); }
+    .kpi-card.avg::before       { background: var(--blue); }
+    .kpi-card.nodata::before    { background: var(--gray); }
+    .kpi-card:hover { border-color:#cbd5e1; box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+    .kpi-card.filter-active { border-color: var(--ink) !important; box-shadow: 0 0 0 3px rgba(15,23,42,.1); }
+    .kpi-card.filter-active.excellent { border-color: var(--green) !important; box-shadow: 0 0 0 3px rgba(34,197,94,.15); }
+    .kpi-card.filter-active.neutre    { border-color: var(--amber) !important; box-shadow: 0 0 0 3px rgba(245,158,11,.15); }
+    .kpi-card.filter-active.alert     { border-color: var(--red)   !important; box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
+    .kpi-card.filter-active.nodata    { border-color: var(--gray)  !important; }
+    .kpi-emoji { font-size: 22px; margin-bottom: 6px; }
+    .kpi-value { font-size: 32px; font-weight: 800; letter-spacing:-1px; line-height:1; margin-bottom:4px; }
+    .kpi-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing:.8px; }
+    .kpi-hint  { font-size: 10px; color: var(--gray); margin-top:3px; }
+    .kpi-card.excellent .kpi-value { color: #16a34a; }
+    .kpi-card.neutre    .kpi-value { color: #d97706; }
+    .kpi-card.alert     .kpi-value { color: #dc2626; }
+    .kpi-card.avg       .kpi-value { color: var(--blue); }
+    .kpi-card.nodata    .kpi-value { color: var(--gray); }
+
+    /* ── Pulse on alert > 0 ── */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+
+    /* ══════════════════════════════════════
+       CONTROLS
+    ══════════════════════════════════════ */
+    .controls { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+    .controls input {
+      background:var(--card); border:1.5px solid var(--border); color:var(--ink);
+      padding:8px 14px; border-radius:8px; font-size:12px; flex:1; min-width:180px;
+      font-family:inherit; transition: border-color .15s, box-shadow .15s;
+    }
+    .controls input:focus { outline:none; border-color:#94a3b8; box-shadow:0 0 0 3px rgba(148,163,184,.2); }
+    .controls input::placeholder { color:#94a3b8; }
+    .controls select {
+      background:var(--card); border:1.5px solid var(--border); color:var(--ink);
+      padding:8px 12px; border-radius:8px; font-size:12px; cursor:pointer; font-family:inherit; min-width:140px;
+    }
+    .controls button {
+      background:var(--ink); color:#fff; border:none; padding:8px 16px; border-radius:8px;
+      font-size:12px; cursor:pointer; font-family:inherit; font-weight:600;
+      display:flex; align-items:center; gap:5px; white-space:nowrap;
+      transition: background .15s, transform .1s;
+    }
+    .controls button:hover { background:#1e293b; transform:translateY(-1px); }
+    .filter-indicator { font-size:11px; color:var(--muted); margin-bottom:10px; }
+    .filter-indicator strong { color:var(--ink); }
+
+    /* ══════════════════════════════════════
+       BODY LAYOUT
+    ══════════════════════════════════════ */
+    .page-body { display:grid; grid-template-columns:1fr 272px; gap:18px; align-items:start; }
+    @media (max-width:1100px) { .page-body { grid-template-columns:1fr; } .page-sidebar { position:static; } }
+
+    /* ══════════════════════════════════════
+       TABLE
+    ══════════════════════════════════════ */
+    .tbl-wrap { background:var(--card); border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; box-shadow:var(--shadow); }
+    table { width:100%; border-collapse:collapse; }
+    thead { background:#f8fafc; }
+    th {
+      padding:11px 14px; text-align:left; font-size:10px; font-weight:700;
+      text-transform:uppercase; letter-spacing:.7px; color:var(--muted);
+      cursor:pointer; user-select:none; white-space:nowrap;
+      border-bottom:1px solid var(--border);
+      transition: color .15s;
+    }
+    th:hover { color:var(--ink); }
+    td { padding:12px 14px; border-top:1px solid #f1f5f9; font-size:12.5px; }
+
+    tr.clickable {
+      cursor:pointer; transition:background .15s;
+      border-left: 3px solid transparent;
+    }
+    tr.clickable:hover { background:#f8fafc; }
+    tr.clickable[data-score="3"] { border-left-color: var(--green); }
+    tr.clickable[data-score="2"] { border-left-color: var(--amber); }
+    tr.clickable[data-score="1"] { border-left-color: var(--red); }
+    tr.clickable[data-score="na"]{ border-left-color: var(--gray); }
+    tr.clickable.open { background: #f8fafc; }
+
+    /* ── Score badges ── */
+    .score-badge {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:3px 12px; border-radius:20px; font-weight:700; font-size:12px;
+      min-width:36px; transition: transform .15s;
+    }
+    .score-badge:hover { transform: scale(1.05); }
+    .score-3  { background:var(--green-dim); color:#15803d; }
+    .score-2  { background:var(--amber-dim); color:#b45309; }
+    .score-1  { background:var(--red-dim);   color:#b91c1c; }
+    .score-na { background:var(--gray-dim);  color:var(--gray); }
+
+    /* ── Pills ── */
+    .pill { display:inline-block; padding:2px 9px; border-radius:8px; font-size:11px; font-weight:500; margin:2px 3px 2px 0; }
+    .pill-problem { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+    .pill-feature { background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; }
+
+    /* ── No data ── */
+    .no-data { color:#94a3b8; font-style:italic; font-size:12px; }
+    .client-link { color:var(--ink2); font-weight:600; font-size:13px; transition:color .15s; }
+    .client-link:hover { color:var(--blue); }
+
+    /* ══════════════════════════════════════
+       DETAIL ROW
+    ══════════════════════════════════════ */
+    .detail-row { display:none; }
+    .detail-row td { padding:0; border-top: 2px solid var(--border); }
+    .detail-content { padding:20px 22px; background:#fafbfc; }
+
+    /* Detail: 2-col grid (calls + emails) */
+    .detail-cols { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    @media (max-width:900px) { .detail-cols { grid-template-columns:1fr; } }
+    .detail-section h4 {
+      font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;
+      letter-spacing:.7px; margin-bottom:12px; display:flex; align-items:center; gap:6px;
+    }
+    .detail-section h4::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* ── Smooth expand animation ── */
+    .detail-row.open { display:table-row !important; }
+    .detail-content { animation: slideDown .2s ease-out; }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Call cards ── */
+    .call-card {
+      background:var(--card); border-radius:10px; padding:12px 14px; margin-bottom:10px;
+      border:1px solid var(--border); border-left:3px solid var(--blue);
+      box-shadow:0 1px 3px rgba(0,0,0,.04);
+      transition: box-shadow .15s, transform .15s;
+    }
+    .call-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+    .call-card.sent-pos { border-left-color: var(--green); }
+    .call-card.sent-neu { border-left-color: var(--amber); }
+    .call-card.sent-neg { border-left-color: var(--red); }
+    .call-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px; }
+    .call-title { font-weight:600; color:var(--ink); font-size:12px; flex:1; line-height:1.4; }
+    .call-meta { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+    .call-date { color:var(--muted); font-size:10px; white-space:nowrap; }
+    .call-summary { color:var(--ink2); font-size:11.5px; line-height:1.6; }
+
+    /* ── Email cards ── */
+    .email-card {
+      background:var(--card); border-radius:10px; padding:10px 13px; margin-bottom:8px;
+      border:1px solid var(--border); border-left:3px solid var(--border);
+      box-shadow:0 1px 3px rgba(0,0,0,.04);
+      transition: box-shadow .15s, transform .15s;
+    }
+    .email-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+    .email-card.incoming { border-left-color: var(--blue); }
+    .email-card.outgoing { border-left-color: #94a3b8; }
+    .email-subject { font-weight:600; color:var(--ink); font-size:12px; margin-bottom:5px; line-height:1.4; }
+    .email-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .dir-in  { background:#eff6ff; color:#1d4ed8; padding:1px 7px; border-radius:8px; font-size:10px; font-weight:600; }
+    .dir-out { background:#f1f5f9; color:#475569; padding:1px 7px; border-radius:8px; font-size:10px; font-weight:600; }
+    .email-sender { color:var(--muted); font-size:10.5px; }
+    .email-date   { color:#94a3b8; font-size:10.5px; }
+
+    /* ── Shared sentiment badges ── */
+    .sent-badge {
+      font-size:10px; font-weight:600; padding:2px 8px; border-radius:8px; white-space:nowrap;
+    }
+    .sent-pos { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+    .sent-neu { background:#fffbeb; color:#d97706; border:1px solid #fde68a; }
+    .sent-neg { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+
+    /* ── Source link ── */
+    .src-link {
+      display:inline-flex; align-items:center; gap:3px;
+      font-size:10px; font-weight:600; color:#7c3aed; text-decoration:none;
+      padding:1px 7px; border-radius:6px; background:#f5f3ff; border:1px solid #e9d5ff;
+      transition: background .15s, color .15s; white-space:nowrap; flex-shrink:0;
+    }
+    .src-link:hover { background:#ede9fe; color:#5b21b6; }
+    .src-link.hs-link { color:#ea580c; background:#fff7ed; border-color:#fed7aa; }
+    .src-link.hs-link:hover { background:#ffedd5; }
+
+    /* ── Empty states ── */
+    .empty-state {
+      display:flex; align-items:center; gap:10px;
+      background:#f8fafc; border-radius:10px; padding:12px 16px;
+      border:1.5px dashed var(--border); color:var(--muted); font-size:12px; font-style:italic;
+    }
+    .empty-state::before { content:"—"; font-size:16px; color:#cbd5e1; flex-shrink:0; }
+
+    /* ══════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════ */
+    .page-sidebar { position:sticky; top:20px; display:flex; flex-direction:column; gap:14px; }
+    .sidebar-card {
+      background:var(--card); border-radius:var(--radius); border:1px solid var(--border);
+      padding:16px 18px; box-shadow:var(--shadow);
+    }
+    .sidebar-card-title { font-size:12px; font-weight:700; color:var(--ink); margin-bottom:2px; }
+    .sidebar-card-sub   { font-size:10px; color:#94a3b8; margin-bottom:14px; }
+
+    /* ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ */
+    footer {
+      text-align:center; padding:24px 0 10px; color:#94a3b8; font-size:10.5px;
+      border-top:1px solid var(--border); margin-top:28px;
+    }
+  </style>
+</head>
+<body>
+<div class="pw">
+
+  <!-- ════════ HEADER ════════ -->
+  <header class="hdr">
+    <div class="hdr-logo">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgODAiIHdpZHRoPSIzMjAiIGhlaWdodD0iODAiPgogIDxkZWZzPgogICAgPCEtLSBCYWNrZ3JvdW5kIGdyYWRpZW50IC0tPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJiZ0dyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMGYxNzJhIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzFlMjkzYiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDwhLS0gR2xvdyBmb3IgdGhlIE0gb3JiIC0tPgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJvcmJHcmFkIiBjeD0iNTAlIiBjeT0iNDAlIiByPSI2MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNGFkZTgwO3N0b3Atb3BhY2l0eToxIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iNjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMjJjNTVlO3N0b3Atb3BhY2l0eToxIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzE1ODAzZDtzdG9wLW9wYWNpdHk6MSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDwhLS0gU3VidGxlIGdsb3cgZmlsdGVyIC0tPgogICAgPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjIuNSIgcmVzdWx0PSJibHVyIi8+CiAgICAgIDxmZU1lcmdlPgogICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iYmx1ciIvPgogICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPgogICAgICA8L2ZlTWVyZ2U+CiAgICA8L2ZpbHRlcj4KICAgIDxmaWx0ZXIgaWQ9InNvZnRHbG93IiB4PSItMzAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxNjAlIj4KICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJibHVyIi8+CiAgICAgIDxmZU1lcmdlPgogICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iYmx1ciIvPgogICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPgogICAgICA8L2ZlTWVyZ2U+CiAgICA8L2ZpbHRlcj4KICAgIDwhLS0gVGV4dCBncmFkaWVudCAtLT4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idGV4dEdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2Y4ZmFmYyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNjYmQ1ZTEiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8IS0tIEFwb3N0cm9waGUgYWNjZW50IGdyYWRpZW50IC0tPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJhY2NlbnRHcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzRhZGU4MCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMyMmM1NWUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgoKICA8IS0tIFBpbGwgYmFja2dyb3VuZCAtLT4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjgwIiByeD0iMTYiIHJ5PSIxNiIgZmlsbD0idXJsKCNiZ0dyYWQpIi8+CiAgPCEtLSBTdWJ0bGUgdG9wIGhpZ2hsaWdodCAtLT4KICA8cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iMzE4IiBoZWlnaHQ9IjM4IiByeD0iMTUiIHJ5PSIxNSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuMDQiLz4KCiAgPCEtLSBHcmVlbiBvcmIgLyBmYWNlIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSIyOCIgZmlsbD0idXJsKCNvcmJHcmFkKSIgZmlsdGVyPSJ1cmwoI3NvZnRHbG93KSIvPgogIDwhLS0gRmFjZTogZXllcyAtLT4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjM1IiByPSI0IiBmaWxsPSIjMGYxNzJhIi8+CiAgPGNpcmNsZSBjeD0iNDgiIGN5PSIzNSIgcj0iNCIgZmlsbD0iIzBmMTcyYSIvPgogIDwhLS0gU2hpbmUgZG90cyBvbiBleWVzIC0tPgogIDxjaXJjbGUgY3g9IjMzLjUiIGN5PSIzMy41IiByPSIxLjMiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjciLz4KICA8Y2lyY2xlIGN4PSI0OS41IiBjeT0iMzMuNSIgcj0iMS4zIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+CiAgPCEtLSBTbWlsZSAoc2xpZ2h0IHNtaXJrIOKAlCAibW9vZHkiIGNhbiBnbyBlaXRoZXIgd2F5KSAtLT4KICA8cGF0aCBkPSJNIDMwIDQ2IFEgNDAgNTMgNTAgNDYiIHN0cm9rZT0iIzBmMTcyYSIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgoKICA8IS0tIFdvcmQgbWFyazogIk1vb2R5IiAtLT4KICA8dGV4dCB4PSI4MCIgeT0iNTEiIGZvbnQtZmFtaWx5PSInSGVsdmV0aWNhIE5ldWUnLCBBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzNCIgZm9udC13ZWlnaHQ9IjgwMCIgbGV0dGVyLXNwYWNpbmc9Ii0xIiBmaWxsPSJ1cmwoI3RleHRHcmFkKSI+TW9vZHk8L3RleHQ+CgogIDwhLS0gQXBvc3Ryb3BoZSArIHMgaW4gZ3JlZW4gYWNjZW50IC0tPgogIDx0ZXh0IHg9IjIwOCIgeT0iNTEiIGZvbnQtZmFtaWx5PSInSGVsdmV0aWNhIE5ldWUnLCBBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzNCIgZm9udC13ZWlnaHQ9IjgwMCIgbGV0dGVyLXNwYWNpbmc9Ii0xIiBmaWxsPSJ1cmwoI2FjY2VudEdyYWQpIj4nczwvdGV4dD4KCiAgPCEtLSBUYWdsaW5lIC0tPgogIDx0ZXh0IHg9IjgwIiB5PSI2NiIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iNTAwIiBsZXR0ZXItc3BhY2luZz0iMi41IiBmaWxsPSIjNjQ3NDhiIiB0ZXh0LXRyYW5zZm9ybT0idXBwZXJjYXNlIj5DVVNUT01FUiBNT09EIERBU0hCT0FSRDwvdGV4dD4KCiAgPCEtLSBTdWJ0bGUgZGVjb3JhdGl2ZSBkb3RzIHRvcC1yaWdodCAtLT4KICA8Y2lyY2xlIGN4PSIyOTAiIGN5PSIxOCIgcj0iMiIgZmlsbD0iIzIyYzU1ZSIgb3BhY2l0eT0iMC41Ii8+CiAgPGNpcmNsZSBjeD0iMzAwIiBjeT0iMTQiIHI9IjEuNSIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC40Ii8+CiAgPGNpcmNsZSBjeD0iMzA4IiBjeT0iMjAiIHI9IjEiIGZpbGw9IiMyMmM1NWUiIG9wYWNpdHk9IjAuMyIvPgo8L3N2Zz4K" alt="Moody\'s" style="height:52px;width:auto">
+    </div>
+    <div class="hdr-sep"></div>
+    <div class="hdr-text">
+      <div class="hdr-title" style="display:none">Moody's</div>
+      <div class="hdr-sub"><span id="liveCount">—</span> active clients · <span id="liveDate">today</span></div>
+    </div>
+    <div class="hdr-pills">
+      <span class="src-pill hs"><span></span>HubSpot</span>
+      <span class="src-pill modjo"><span></span>Modjo</span>
+    </div>
+  </header>
+
+  <!-- ════════ KPI CARDS ════════ -->
+  <div class="kpi-grid">
+    <div class="kpi-card excellent" data-filter="3">
+      <div class="kpi-emoji">😊</div>
+      <div class="kpi-value">1</div>
+      <div class="kpi-label">Excellent</div>
+      <div class="kpi-hint">Score 3 · Filtrer</div>
+    </div>
+    <div class="kpi-card neutre" data-filter="2">
+      <div class="kpi-emoji">😐</div>
+      <div class="kpi-value">5</div>
+      <div class="kpi-label">Neutral</div>
+      <div class="kpi-hint">Score 2 · Filtrer</div>
+    </div>
+    <div class="kpi-card alert" data-filter="1">
+      <div class="kpi-emoji">😟</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-label">Alert</div>
+      <div class="kpi-hint">Score 1 · Filtrer</div>
+    </div>
+    <div class="kpi-card avg">
+      <div class="kpi-emoji">📊</div>
+      <div class="kpi-value">2.2</div>
+      <div class="kpi-label">Avg Score</div>
+    </div>
+    <div class="kpi-card nodata" data-filter="na">
+      <div class="kpi-emoji">❓</div>
+      <div class="kpi-value">4</div>
+      <div class="kpi-label">No Data</div>
+      <div class="kpi-hint">Filtrer</div>
+    </div>
+  </div>
+
+  <!-- ════════ CONTROLS ════════ -->
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍  Search for a client...">
+    <select id="csmFilter"><option value="">All CSMs</option></select>
+  </div>
+  <div class="filter-indicator" id="filterIndicator" style="display:none">
+    Active filter: <strong id="filterLabel"></strong> —
+    <a href="#" onclick="resetFilters();return false;" style="color:var(--blue);text-decoration:none">Reset</a>
+  </div>
+
+  <!-- ════════ BODY ════════ -->
+  <div class="page-body">
+    <div class="page-main">
+      <div class="tbl-wrap">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">Client ↕</th>
+            <th onclick="sortTable(1)">Mood ↕</th>
+            <th onclick="sortTable(2)">Last Call ↕</th>
+            <th>Key Issues</th>
+            <th>Feature Requests</th>
+            <th>CSM</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- ══ POLARISE ══ -->
+          <tr class="clickable" data-score="3" data-segment="Medium Account" data-csm="—" data-date="2026-04-15" data-name="polarise">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/41392015388" class="client-link" target="_blank" onclick="event.stopPropagation()">Polarise</a></td>
+            <td><span class="score-badge score-3">😊 3</span></td>
+            <td style="color:var(--muted);font-size:12px">15/04/26</td>
+            <td><span class="pill pill-problem">Emails langue mixte (mineur)</span></td>
+            <td><span class="no-data">—</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section">
+                <h4>📞 Appels Modjo</h4>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">Tomorro &lt;&gt; Polarise - Follow up meeting</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">15/04/26</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Maximilian très satisfait : "I'm still very happy with it. It's working." Plus de 300 contrats sur la plateforme (95 ajoutés en mars). Transition vers Linda. Point mineur : mélange anglais/français dans certains emails système.</div></div>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">Tomorro &lt;&gt; Polarise - End of onboarding &amp; next steps</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">24/02/26</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Bilan onboarding très positif : 12 utilisateurs formés, 180 contrats, 18 types configurés. "Everyone I talked with was very happy to have the tool."</div></div>
+                <div class="call-card sent-neu"><div class="call-header"><span class="call-title">Tomorro Question</span><div class="call-meta"><span class="sent-badge sent-neu">Neutral</span><span class="call-date">22/01/26</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Session travail sur l'arborescence et droits d'accès. Feature request : droits paramétrables dès la création d'un projet.</div></div>
+                <div class="call-card sent-neu"><div class="call-header"><span class="call-title">Training Tomorro Contract Tool</span><div class="call-meta"><span class="sent-badge sent-neu">Neutral</span><span class="call-date">21/01/26</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Formation complète (NDA, IA Oro, signature, repository). Bugs mineurs. Questions RGPD.</div></div>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">Tomorro &lt;&gt; Polarise - Onboarding review</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">13/01/26</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">37 projets, 30 membres, 15 types de contrats. "I think we can get this to work."</div></div>
+              </div>
+              <div class="detail-section">
+                <h4>📧 Emails HubSpot</h4>
+                <div class="email-card incoming"><div class="email-subject">Zugesagt: Tomorro &lt;&gt; Polarise - Follow up meeting - juin 2026</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">m.damm@polarise.eu</span><span class="email-date">15/04/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/41392015388" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card outgoing"><div class="email-subject">Re: [External] In Munich tomorrow</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">thibaut@tomorro.com</span><span class="email-date">24/03/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/41392015388" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card outgoing"><div class="email-subject">Tomorro &lt;&gt; Polarise - End of onboarding &amp; next steps</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">julia@tomorro.com</span><span class="email-date">24/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/41392015388" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card incoming"><div class="email-subject">AW: Tomorro - Vielen Dank für Ihre Teilnahme</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-pos">Positif</span><span class="email-sender">m.damm@polarise.eu</span><span class="email-date">20/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/41392015388" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+              </div>
+            </div>
+          </div></td></tr>
+
+          <!-- ══ GL EVENTS RH ══ -->
+          <tr class="clickable" data-score="2" data-segment="Enterprise" data-csm="—" data-date="2025-08-29" data-name="gl events rh">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34261862152" class="client-link" target="_blank" onclick="event.stopPropagation()">GL Events RH</a></td>
+            <td><span class="score-badge score-2">😐 2</span></td>
+            <td style="color:var(--muted);font-size:12px">29/08/25</td>
+            <td><span class="pill pill-problem">Bug approbateur/signataires</span><span class="pill pill-problem">Tableau dynamique co-contractant</span></td>
+            <td><span class="pill pill-feature">API CGDIM</span><span class="pill pill-feature">Délégation signature</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section">
+                <h4>📞 Appels Modjo</h4>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">[Tomorro x GL events RH] Objectifs 2ème semestre 2025</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">29/08/25</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Passation CSM Laure → Alexia. Blocage : co-contractant ne peut pas remplir le tableau dynamique. Bug suppression dossiers. Intégration CGDIM stand-by 2026.</div></div>
+                <div class="call-card sent-neu"><div class="call-header"><span class="call-title">[Tomorro x GL events RH] Tableaux dynamiques</span><div class="call-meta"><span class="sent-badge sent-neu">Neutral</span><span class="call-date">08/07/25</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Session démo tableaux dynamiques pour dématérialisation dossier salarié. Limitations champs non filtrables, expérience mobile non priorisée.</div></div>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">[Tomorro x GL events RH] Formation utilisateur RH</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">18/06/25</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Formation équipes RH/DRH. Charline prépare une vidéo pour les signataires. Engagement fort.</div></div>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">GL events RH x Tomorro : Passation</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">03/06/25</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Bilan positif : équipe pilote active, GL Events top utilisateur (30j). Déploiement multi-BU sept. 2025.</div></div>
+              </div>
+              <div class="detail-section">
+                <h4>📧 Emails HubSpot</h4>
+                <div class="email-card outgoing"><div class="email-subject">Incident résolu – Vérification requise sur certains contrats</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neg">Négatif</span><span class="email-sender">marianne@tomorro.com</span><span class="email-date">27/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34261862152" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card outgoing"><div class="email-subject">Re: Re: Problème d'approbateur et signataires</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neg">Négatif</span><span class="email-sender">benjamin@tomorro.com</span><span class="email-date">26/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34261862152" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card incoming"><div class="email-subject">Problème d'approbateur et signataires</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neg">Négatif</span><span class="email-sender">philipp.koerner@gl-events.com</span><span class="email-date">25/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34261862152" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card incoming"><div class="email-subject">RE: Répartition enveloppe Tomorro</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">charline.garnier@gl-events.com</span><span class="email-date">26/01/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34261862152" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+              </div>
+            </div>
+          </div></td></tr>
+
+          <!-- ══ INFOPRO DIGITAL RH ══ -->
+          <tr class="clickable" data-score="2" data-segment="Strategic Account" data-csm="—" data-date="" data-name="infopro digital rh">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33695278612" class="client-link" target="_blank" onclick="event.stopPropagation()">Infopro Digital RH</a></td>
+            <td><span class="score-badge score-2">😐 2</span></td>
+            <td style="color:var(--muted);font-size:12px">—</td>
+            <td><span class="no-data">—</span></td>
+            <td><span class="pill pill-feature">Questions fonctionnalités</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section">
+                <h4>📞 Appels Modjo</h4>
+                <div class="empty-state">No calls found on Modjo for this account.</div>
+              </div>
+              <div class="detail-section">
+                <h4>📧 Emails HubSpot</h4>
+                <div class="email-card incoming"><div class="email-subject">RE: fonctionnalités TOMORRO</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">jeanne.seghiri@infopro-digital.com</span><span class="email-date">25/03/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33695278612" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card incoming"><div class="email-subject">Acceptée : Tomorro x Infopro - Suite formation</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">frederique.germain@infopro-digital.com</span><span class="email-date">24/03/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33695278612" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card outgoing"><div class="email-subject">Re: fonctionnalités TOMORRO</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">laurie@tomorro.com</span><span class="email-date">24/03/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33695278612" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card incoming"><div class="email-subject">RE: Suite à notre formation de ce jour - 25/02</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">frederique.germain@infopro-digital.com</span><span class="email-date">25/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/33695278612" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+              </div>
+            </div>
+          </div></td></tr>
+
+          <!-- ══ HABITATION BATIMENT ══ -->
+          <tr class="clickable" data-score="2" data-segment="Medium Account" data-csm="—" data-date="2025-08-29" data-name="habitation batiment">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/25976217869" class="client-link" target="_blank" onclick="event.stopPropagation()">Habitation Bâtiment</a></td>
+            <td><span class="score-badge score-2">😐 2</span></td>
+            <td style="color:var(--muted);font-size:12px">29/08/25</td>
+            <td><span class="pill pill-problem">Bug signature contrat</span><span class="pill pill-problem">Absence paraf</span></td>
+            <td><span class="pill pill-feature">Paraf par page</span><span class="pill pill-feature">Logos conditionnels</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section">
+                <h4>📞 Appels Modjo</h4>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">Tomorro x HBF - Léa / Laurie</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">29/08/25</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Assistance Léa sur gestion champs participants. Résolution champs répétés, configuration masquage, archivage automatique. Bonne dynamique client-CSM.</div></div>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">[Tomorro x Habitation Batiment] : point de suivi</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">26/08/25</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">188 contrats hébergés (179 signés). Aude satisfaite. Points d'amélioration : logos conditionnels, paraf. Numérotation pages résolue.</div></div>
+              </div>
+              <div class="detail-section">
+                <h4>📧 Emails HubSpot</h4>
+                <div class="email-card outgoing"><div class="email-subject">Notre prochain point de suivi - Tomorro</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">laurie@tomorro.com</span><span class="email-date">20/03/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/25976217869" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card outgoing"><div class="email-subject">Tomorro - Bug lors de la signature d'un contrat</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neg">Négatif</span><span class="email-sender">laurie@tomorro.com</span><span class="email-date">02/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/25976217869" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card outgoing"><div class="email-subject">Tomorro x Habitation Bâtiment : fin onboarding</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">alexia@gotomorro.com</span><span class="email-date">25/03/25</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/25976217869" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+              </div>
+            </div>
+          </div></td></tr>
+
+          <!-- ══ RÉMY COINTREAU CEP ══ -->
+          <tr class="clickable" data-score="2" data-segment="Enterprise" data-csm="—" data-date="2025-12-16" data-name="rémy cointreau cep">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34259224328" class="client-link" target="_blank" onclick="event.stopPropagation()">Rémy Cointreau — CEP</a></td>
+            <td><span class="score-badge score-2">😐 2</span></td>
+            <td style="color:var(--muted);font-size:12px">16/12/25</td>
+            <td><span class="pill pill-problem">Champs facultatifs bloquants</span><span class="pill pill-problem">Gestion modèles multi-contrats</span></td>
+            <td><span class="pill pill-feature">Champs vraiment facultatifs</span><span class="pill pill-feature">Logique conditionnelle</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section">
+                <h4>📞 Appels Modjo</h4>
+                <div class="call-card sent-pos"><div class="call-header"><span class="call-title">La Maison Rémy Martin X Tomorro</span><div class="call-meta"><span class="sent-badge sent-pos">Positif</span><span class="call-date">16/12/25</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Blocage champs "facultatifs" bloquant envoi en signature. Stephanie : "Ça me dépanne pour ce document-là". Ticket ouvert. Collaboration positive.</div></div>
+                <div class="call-card sent-neu"><div class="call-header"><span class="call-title">Tomorro &lt;&gt; CEP - Archivage d'un contrat signé</span><div class="call-meta"><span class="sent-badge sent-neu">Neutral</span><span class="call-date">18/07/25</span><a href="https://app.modjo.ai" class="src-link" target="_blank" onclick="event.stopPropagation()">↗ Modjo</a></div></div><div class="call-summary">Session import contrats signés. Démo IA (code fournisseur SAP). Questions profils utilisateurs. Prochaine étape : modèle d'avenant fin août.</div></div>
+              </div>
+              <div class="detail-section">
+                <h4>📧 Emails HubSpot</h4>
+                <div class="email-card incoming"><div class="email-subject">RE: Rémy Martin - Demande en cours sur modèle Contrat Alliance Centaure</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">stephanie.lennon@remy-cointreau.com</span><span class="email-date">05/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34259224328" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card outgoing"><div class="email-subject">Re: Rémy Martin - Demande en cours</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">marianne@tomorro.com</span><span class="email-date">04/02/26</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34259224328" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card incoming"><div class="email-subject">RE: TOMORRO CEP - Préparation lancement</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">stephanie.lennon@remy-cointreau.com</span><span class="email-date">13/10/25</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/34259224328" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+              </div>
+            </div>
+          </div></td></tr>
+
+          <!-- ══ GP EXPLORER ══ -->
+          <tr class="clickable" data-score="2" data-segment="Small Account" data-csm="—" data-date="" data-name="gp explorer">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/42606417725" class="client-link" target="_blank" onclick="event.stopPropagation()">GP Explorer</a></td>
+            <td><span class="score-badge score-2">😐 2</span></td>
+            <td style="color:var(--muted);font-size:12px">—</td>
+            <td><span class="no-data">—</span></td>
+            <td><span class="no-data">—</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section"><h4>📞 Appels Modjo</h4><div class="empty-state">No calls found on Modjo for this account.</div></div>
+              <div class="detail-section">
+                <h4>📧 Emails HubSpot</h4>
+                <div class="email-card outgoing"><div class="email-subject">Un petit coup de pouce pour Tomorro :)</div><div class="email-meta"><span class="dir-out">→ Outbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">aaron@tomorro.com</span><span class="email-date">25/06/25</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/42606417725" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+                <div class="email-card incoming"><div class="email-subject">RE: Mise en relation client Tomorro : Bump</div><div class="email-meta"><span class="dir-in">← Inbound</span><span class="sent-badge sent-neu">Neutral</span><span class="email-sender">aurore.vanelslande@skeepers.com</span><span class="email-date">17/04/25</span><a href="https://app.hubspot.com/contacts/7016971/record/0-2/42606417725" class="src-link hs-link" target="_blank" onclick="event.stopPropagation()">↗ HubSpot</a></div></div>
+              </div>
+            </div>
+          </div></td></tr>
+
+          <!-- ══ N/A CLIENTS ══ -->
+          <tr class="clickable" data-score="na" data-segment="Key Account" data-csm="—" data-date="" data-name="cité internationale universitaire de paris rh">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/46467510315" class="client-link" target="_blank" onclick="event.stopPropagation()">Cité Internationale Universitaire — RH</a></td>
+            <td><span class="score-badge score-na">❓</span></td>
+            <td style="color:var(--muted);font-size:12px">—</td>
+            <td><span class="no-data">—</span></td><td><span class="no-data">—</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section"><h4>📞 Appels Modjo</h4><div class="empty-state">Aucun appel trouvé.</div></div>
+              <div class="detail-section"><h4>📧 Emails HubSpot</h4><div class="empty-state">No emails found in HubSpot.</div></div>
+            </div>
+          </div></td></tr>
+
+          <tr class="clickable" data-score="na" data-segment="Small Account" data-csm="—" data-date="" data-name="cheerz rh">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/45987145386" class="client-link" target="_blank" onclick="event.stopPropagation()">Cheerz RH</a></td>
+            <td><span class="score-badge score-na">❓</span></td>
+            <td style="color:var(--muted);font-size:12px">—</td>
+            <td><span class="no-data">—</span></td><td><span class="no-data">—</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section"><h4>📞 Appels Modjo</h4><div class="empty-state">Aucun appel trouvé.</div></div>
+              <div class="detail-section"><h4>📧 Emails HubSpot</h4><div class="empty-state">No emails found in HubSpot.</div></div>
+            </div>
+          </div></td></tr>
+
+          <tr class="clickable" data-score="na" data-segment="Small Account" data-csm="—" data-date="" data-name="kalhyge">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/35599744087" class="client-link" target="_blank" onclick="event.stopPropagation()">Kalhyge</a></td>
+            <td><span class="score-badge score-na">❓</span></td>
+            <td style="color:var(--muted);font-size:12px">—</td>
+            <td><span class="no-data">—</span></td><td><span class="no-data">—</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section"><h4>📞 Appels Modjo</h4><div class="empty-state">Aucun appel trouvé.</div></div>
+              <div class="detail-section"><h4>📧 Emails HubSpot</h4><div class="empty-state">No emails found in HubSpot.</div></div>
+            </div>
+          </div></td></tr>
+
+          <tr class="clickable" data-score="na" data-segment="Medium Account" data-csm="—" data-date="" data-name="ozi sas">
+            <td><a href="https://app.hubspot.com/contacts/7016971/record/0-2/40695694084" class="client-link" target="_blank" onclick="event.stopPropagation()">Ozi SAS</a></td>
+            <td><span class="score-badge score-na">❓</span></td>
+            <td style="color:var(--muted);font-size:12px">—</td>
+            <td><span class="no-data">—</span></td><td><span class="no-data">—</span></td>
+         
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">—</td>
+          </tr>
+          <tr class="detail-row"><td colspan="6"><div class="detail-content">
+            <div class="detail-cols">
+              <div class="detail-section"><h4>📞 Appels Modjo</h4><div class="empty-state">Aucun appel trouvé.</div></div>
+              <div class="detail-section"><h4>📧 Emails HubSpot</h4><div class="empty-state">No emails found in HubSpot.</div></div>
+            </div>
+          </div></td></tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- ── Sidebar ── -->
+    <aside class="page-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">Mood Distribution</div>
+        <div class="sidebar-card-sub">Updated with filters</div>
+        <div style="position:relative;height:190px"><canvas id="sidebarDonut"></canvas></div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">Health by Segment</div>
+        <div class="sidebar-card-sub">Visible clients × score</div>
+        <div style="position:relative;height:220px"><canvas id="sidebarSegment"></canvas></div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>Moody's · Tomorro Customer Mood Score · HubSpot × Modjo · 16/04/26</footer>
+</div>
+
+<script>
+  // ════════════════════════════════
+  //  FILTERS
+  // ════════════════════════════════
+  var activeFilters = { search:"", score:"", csm:"" };
+
+  document.querySelectorAll(".kpi-card[data-filter]").forEach(function(card){
+    card.addEventListener("click",function(){
+      var f=this.getAttribute("data-filter");
+      if(activeFilters.score===f){ activeFilters.score=""; this.classList.remove("filter-active"); }
+      else {
+        activeFilters.score=f;
+        document.querySelectorAll(".kpi-card[data-filter]").forEach(function(c){c.classList.remove("filter-active");});
+        this.classList.add("filter-active");
+      }
+      applyFilters();
+    });
+  });
+
+  document.getElementById("searchInput").addEventListener("input",function(){
+    activeFilters.search=this.value.toLowerCase().trim(); applyFilters();
+  });
+  document.getElementById("csmFilter").addEventListener("change",function(){
+    activeFilters.csm=this.value; applyFilters();
+  });
+
+  function applyFilters(){
+    var visible=0;
+    var scoreCounts={"3":0,"2":0,"1":0,"na":0};
+    var SEGS=["Enterprise","Strategic Account","Key Account","Medium Account","Small Account"];
+    var segData={};
+    SEGS.forEach(function(s){segData[s]={"3":0,"2":0,"1":0,"na":0};});
+
+    document.querySelectorAll("tbody tr.clickable").forEach(function(row){
+      var score=row.getAttribute("data-score")||"na";
+      var name=row.getAttribute("data-name")||"";
+      var csm=row.getAttribute("data-csm")||"";
+      var seg=row.getAttribute("data-segment")||"";
+      var show=true;
+      if(activeFilters.score && activeFilters.score!==score) show=false;
+      if(activeFilters.search && name.indexOf(activeFilters.search)<0) show=false;
+      if(activeFilters.csm && csm!==activeFilters.csm) show=false;
+
+      var dr=row.nextElementSibling;
+      if(show){
+        visible++;
+        row.style.display="";
+        // detail row: clear any forced-hide, CSS .detail-row handles visibility
+        if(dr) dr.style.removeProperty("display");
+        scoreCounts[score]=(scoreCounts[score]||0)+1;
+        if(segData[seg]) segData[seg][score]=(segData[seg][score]||0)+1;
+      } else {
+        row.style.display="none";
+        if(dr){ dr.classList.remove("open"); dr.style.display="none"; }
+      }
+    });
+
+    var fi=document.getElementById("filterIndicator");
+    if(activeFilters.score||activeFilters.search||activeFilters.csm){
+      fi.style.display="block";
+      var labels={"3":"😊 Excellent","2":"😐 Neutre","1":"😟 Alerte","na":"❓ Sans données"};
+      document.getElementById("filterLabel").textContent=
+        activeFilters.score?labels[activeFilters.score]:
+        activeFilters.search?'"'+activeFilters.search+'"':
+        activeFilters.csm;
+    } else { fi.style.display="none"; }
+
+    updateSidebarCharts(scoreCounts,segData,SEGS);
+  }
+
+  function resetFilters(){
+    activeFilters={search:"",score:"",csm:""};
+    document.getElementById("searchInput").value="";
+    document.getElementById("csmFilter").value="";
+    document.querySelectorAll(".kpi-card[data-filter]").forEach(function(c){c.classList.remove("filter-active");});
+    applyFilters();
+  }
+
+  // ════════════════════════════════
+  //  ROW EXPAND / COLLAPSE
+  // ════════════════════════════════
+  document.querySelectorAll("tr.clickable").forEach(function(row){
+    row.addEventListener("click",function(){
+      var dr=this.nextElementSibling;
+      if(!dr||!dr.classList.contains("detail-row")) return;
+      var isOpen=dr.classList.contains("open");
+      // Close all
+      document.querySelectorAll(".detail-row.open").forEach(function(r){
+        r.classList.remove("open"); r.style.removeProperty("display");
+        var pr=r.previousElementSibling; if(pr) pr.classList.remove("open");
+      });
+      if(!isOpen){ dr.style.removeProperty("display"); dr.classList.add("open"); this.classList.add("open"); }
+    });
+  });
+
+  // ════════════════════════════════
+  //  SORT
+  // ════════════════════════════════
+  var sortDir=[false,false,false];
+  function sortTable(col){
+    var tbody=document.querySelector("#mainTable tbody");
+    var pairs=[];
+    var rows=tbody.querySelectorAll("tr.clickable");
+    rows.forEach(function(r){ pairs.push([r,r.nextElementSibling]); });
+    sortDir[col]=!sortDir[col];
+    pairs.sort(function(a,b){
+      var va="",vb="";
+      if(col===0){va=a[0].getAttribute("data-name")||"";vb=b[0].getAttribute("data-name")||"";}
+      else if(col===1){va=a[0].getAttribute("data-score")||"";vb=b[0].getAttribute("data-score")||"";}
+      else if(col===2){va=a[0].getAttribute("data-date")||"";vb=b[0].getAttribute("data-date")||"";}
+      if(va<vb) return sortDir[col]?-1:1;
+      if(va>vb) return sortDir[col]?1:-1;
+      return 0;
+    });
+    pairs.forEach(function(p){ tbody.appendChild(p[0]); if(p[1]) tbody.appendChild(p[1]); });
+  }
+
+  // ════════════════════════════════
+  //  CSM DROPDOWN
+  // ════════════════════════════════
+  (function(){
+    var sel=document.getElementById("csmFilter");
+    var csms=new Set();
+    document.querySelectorAll("tr.clickable").forEach(function(r){
+      var c=r.getAttribute("data-csm"); if(c&&c!=="—") csms.add(c);
+    });
+    csms.forEach(function(c){ var o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); });
+  })();
+
+  // ════════════════════════════════
+  //  SIDEBAR CHARTS
+  // ════════════════════════════════
+  var sidebarDonut=null, sidebarSegment=null;
+  (function initSidebarCharts(){
+    var SEGS=["Enterprise","Strategic Account","Key Account","Medium Account","Small Account"];
+    var dc=document.getElementById("sidebarDonut").getContext("2d");
+    sidebarDonut=new Chart(dc,{type:"doughnut",data:{
+      labels:["😊 Excellent","😐 Neutre","😟 Alerte","❓ No Data"],
+      datasets:[{data:[0,0,0,0],backgroundColor:["#22c55e","#f59e0b","#ef4444","#e2e8f0"],borderWidth:2,borderColor:"#fff"}]
+    },options:{plugins:{legend:{position:"bottom",labels:{font:{size:10},padding:8}}},cutout:"68%",maintainAspectRatio:false}});
+
+    var sc=document.getElementById("sidebarSegment").getContext("2d");
+    sidebarSegment=new Chart(sc,{type:"bar",data:{labels:SEGS,datasets:[
+      {label:"Excellent",data:[0,0,0,0,0],backgroundColor:"#22c55e"},
+      {label:"Neutral",   data:[0,0,0,0,0],backgroundColor:"#f59e0b"},
+      {label:"Alert",   data:[0,0,0,0,0],backgroundColor:"#ef4444"},
+      {label:"N/A",      data:[0,0,0,0,0],backgroundColor:"#e2e8f0"}
+    ]},options:{indexAxis:"y",plugins:{legend:{position:"bottom",labels:{font:{size:9},padding:6}}},
+      scales:{x:{stacked:true,ticks:{font:{size:9}}},y:{stacked:true,ticks:{font:{size:9}}}},maintainAspectRatio:false}});
+    applyFilters();
+  })();
+
+  function updateSidebarCharts(scoreCounts,segData,SEGS){
+    if(!sidebarDonut||!sidebarSegment) return;
+    sidebarDonut.data.datasets[0].data=[scoreCounts["3"]||0,scoreCounts["2"]||0,scoreCounts["1"]||0,scoreCounts["na"]||0];
+    sidebarDonut.update("none");
+    ["3","2","1","na"].forEach(function(sc,di){
+      sidebarSegment.data.datasets[di].data=SEGS.map(function(seg){return(segData[seg]&&segData[seg][sc])||0;});
+    });
+    sidebarSegment.update("none");
+  }
+
+
+
+  // Update header live count
+  (function() {
+    var rows = document.querySelectorAll("tr.clickable");
+    document.getElementById("liveCount").textContent = rows.length;
+    var d = new Date();
+    document.getElementById("liveDate").textContent = 
+      d.toLocaleDateString("en-GB", {day:"2-digit", month:"short", year:"2-digit"});
+  })();
+
+</script>
+</body>
+</html>

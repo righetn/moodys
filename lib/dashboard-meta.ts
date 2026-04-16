@@ -1,8 +1,6 @@
-/** Métadonnées affichées en dur (plus stockées en base). Les données clients viennent du serveur puis du contexte React (bundle client). */
+/** Static copy for the dashboard shell (client data comes from the server / context). */
 export const DASHBOARD_META = {
-  title: "Tomorro — Customer Sentiment Dashboard",
-  subtitle:
-    "Données Modjo × HubSpot · Analyse automatique des scores clients",
-  footer:
-    "Tomorro Customer Sentiment Dashboard · Données HubSpot × Modjo · Analyse automatique",
+  title: "Moody's Customer Mood Dashboard",
+  subtitle: "HubSpot × Modjo · Automated client mood scoring",
+  footer: "Moody's · Tomorro Customer Mood Score · HubSpot × Modjo",
 } as const

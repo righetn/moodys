@@ -1,15 +1,9 @@
 import type { DashboardClient, DashboardKpi } from "@/types/dashboard"
 
-function pct(count: number, total: number): string {
-  if (total === 0) return "0% des clients"
-  return `${Math.round((count / total) * 100)}% des clients`
-}
-
 /**
- * Agrégations sur les lignes `score` / clients (équivalent des KPIs issus de data.json).
+ * KPI rows derived from client scores (matches dashboard card layout).
  */
 export function computeKpisFromClients(clients: DashboardClient[]): DashboardKpi[] {
-  const n = clients.length
   const excellent = clients.filter((c) => c.score === 3).length
   const attention = clients.filter((c) => c.score === 2).length
   const alert = clients.filter((c) => c.score === 1).length
@@ -26,33 +20,33 @@ export function computeKpisFromClients(clients: DashboardClient[]): DashboardKpi
   return [
     {
       tone: "excellent",
-      label: "Excellent (Score 3)",
+      label: "EXCELLENT",
       value: String(excellent),
-      sublabel: pct(excellent, n),
+      sublabel: "Score 3 · Filter",
     },
     {
       tone: "attention",
-      label: "Attention (Score 2)",
+      label: "NEUTRAL",
       value: String(attention),
-      sublabel: pct(attention, n),
+      sublabel: "Score 2 · Filter",
     },
     {
       tone: "alert",
-      label: "Alerte (Score 1)",
+      label: "ALERT",
       value: String(alert),
-      sublabel: pct(alert, n),
+      sublabel: "Score 1 · Filter",
     },
     {
       tone: "avg",
-      label: "Score Moyen",
+      label: "AVG SCORE",
       value: avg,
-      sublabel: "sur 3",
+      sublabel: "out of 3",
     },
     {
       tone: "nodata",
-      label: "Sans données",
+      label: "NO DATA",
       value: String(nodata),
-      sublabel: pct(nodata, n),
+      sublabel: "Filter",
     },
   ]
 }

@@ -16,11 +16,15 @@ import type {
 } from "@/types/dashboard"
 
 const SCORE_FILTER_OPTIONS: DashboardFilterOption[] = [
-  { value: "all", label: "Tous les scores" },
-  { value: "1", label: "🔴 Alerte (1)" },
-  { value: "2", label: "🟠 Attention (2)" },
-  { value: "3", label: "🟢 Excellent (3)" },
-  { value: "na", label: "Sans données" },
+  { value: "all", label: "All scores" },
+  { value: "1", label: "Alert (1)" },
+  { value: "2", label: "Neutral (2)" },
+  { value: "3", label: "Excellent (3)" },
+  { value: "na", label: "No data" },
+]
+
+const CSM_FILTER_OPTIONS: DashboardFilterOption[] = [
+  { value: "all", label: "All CSMs" },
 ]
 
 export type DashboardContextValue = {
@@ -32,8 +36,11 @@ export type DashboardContextValue = {
   setScoreFilter: (v: string) => void
   segmentFilter: string
   setSegmentFilter: (v: string) => void
+  csmFilter: string
+  setCsmFilter: (v: string) => void
   segmentOptions: DashboardFilterOption[]
   scoreOptions: DashboardFilterOption[]
+  csmOptions: DashboardFilterOption[]
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null)
@@ -50,6 +57,7 @@ export function DashboardProvider({
   const [search, setSearch] = useState("")
   const [scoreFilter, setScoreFilter] = useState("all")
   const [segmentFilter, setSegmentFilter] = useState("all")
+  const [csmFilter, setCsmFilter] = useState("all")
 
   const segmentOptions = useMemo(() => {
     const seen = new Set<string>()
@@ -61,7 +69,7 @@ export function DashboardProvider({
       }
     }
     dynamic.sort((a, b) => a.label.localeCompare(b.label, "fr"))
-    return [{ value: "all", label: "Tous les segments" }, ...dynamic]
+    return [{ value: "all", label: "All segments" }, ...dynamic]
   }, [clients])
 
   const value = useMemo(
@@ -74,8 +82,11 @@ export function DashboardProvider({
       setScoreFilter,
       segmentFilter,
       setSegmentFilter,
+      csmFilter,
+      setCsmFilter,
       segmentOptions,
       scoreOptions: SCORE_FILTER_OPTIONS,
+      csmOptions: CSM_FILTER_OPTIONS,
     }),
     [
       clients,
@@ -83,6 +94,7 @@ export function DashboardProvider({
       search,
       scoreFilter,
       segmentFilter,
+      csmFilter,
       segmentOptions,
     ],
   )
