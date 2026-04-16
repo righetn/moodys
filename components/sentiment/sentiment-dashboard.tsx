@@ -1,6 +1,7 @@
 "use client";
 
 import {Fragment, useCallback, useMemo, useState} from "react";
+import Image from "next/image";
 import {Download, Search} from "lucide-react";
 
 import {DashboardSidebarStats} from "@/components/sentiment/dashboard-sidebar-stats";
@@ -231,22 +232,20 @@ export function SentimentDashboard() {
       <div className="mx-auto max-w-[1480px] px-6 pb-10 pt-6 md:px-7">
         <header className="mb-6 flex flex-wrap items-center gap-5 border-b border-border pb-5">
           <div
-            className="flex h-[72px] w-[min(100%,220px)] shrink-0 flex-col justify-center rounded-xl bg-slate-950 px-3 py-2 text-white shadow-sm dark:bg-slate-950"
+            className="flex w-fit max-w-[min(100%,120px)] shrink-0 flex-col justify-center gap-1 rounded-xl border border-border bg-background px-2 py-1.5 shadow-sm sm:max-w-[min(100%,132px)]"
             aria-label={DASHBOARD_META.title}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-2xl leading-none" aria-hidden>
-                😊
-              </span>
-              <div className="min-w-0 leading-tight">
-                <div className="text-[17px] font-extrabold tracking-tight">
-                  <span className="text-white">Moody</span>
-                  <span className="text-emerald-400">{"'s"}</span>
-                </div>
-                <div className="text-[8px] font-semibold tracking-[0.22em] text-slate-400 uppercase">
-                  Customer mood dashboard
-                </div>
-              </div>
+            <Image
+              src="/logo.png"
+              alt="Moody's"
+              width={1024}
+              height={559}
+              priority
+              sizes="(max-width: 640px) 83px, 93px"
+              className="block h-auto w-[83px] max-w-full object-contain object-left sm:w-[93px]"
+            />
+            <div className="text-[8px] font-semibold tracking-[0.22em] text-muted-foreground uppercase">
+              Customer mood dashboard
             </div>
           </div>
 
