@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react"
 
+import { computeKpisFromClients } from "@/lib/kpis-from-clients"
 import type {
   DashboardClient,
   DashboardFilterOption,
@@ -39,13 +40,13 @@ const DashboardContext = createContext<DashboardContextValue | null>(null)
 
 export function DashboardProvider({
   clients,
-  kpis,
   children,
 }: {
   clients: DashboardClient[]
-  kpis: DashboardKpi[]
   children: ReactNode
 }) {
+  const kpis = useMemo(() => computeKpisFromClients(clients), [clients])
+
   const [search, setSearch] = useState("")
   const [scoreFilter, setScoreFilter] = useState("all")
   const [segmentFilter, setSegmentFilter] = useState("all")

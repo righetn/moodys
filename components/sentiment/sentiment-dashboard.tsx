@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { escapeCsvField } from "@/lib/csv-escape"
 import { DASHBOARD_META } from "@/lib/dashboard-meta"
 import { cn } from "@/lib/utils"
 import type { DashboardClient } from "@/types/dashboard"
@@ -88,6 +89,14 @@ function compareClients(
     return dir * va.localeCompare(vb)
   }
   return 0
+}
+
+function ariaSortState(
+  sort: { col: SortCol; asc: boolean } | null,
+  col: SortCol,
+): "ascending" | "descending" | "none" {
+  if (!sort || sort.col !== col) return "none"
+  return sort.asc ? "ascending" : "descending"
 }
 
 export function SentimentDashboard() {
@@ -158,14 +167,14 @@ export function SentimentDashboard() {
       const problems = c.problems.join(" ").replace(/\s+/g, " ").trim() || "—"
       const features = c.features.join(" ").replace(/\s+/g, " ").trim() || "—"
       return [
-        c.displayName,
-        c.segment,
-        scoreLabel,
-        trend,
-        sentiment,
-        last,
-        `"${problems.replace(/"/g, '""')}"`,
-        `"${features.replace(/"/g, '""')}"`,
+        escapeCsvField(c.displayName),
+        escapeCsvField(c.segment),
+        escapeCsvField(scoreLabel),
+        escapeCsvField(trend),
+        escapeCsvField(sentiment),
+        escapeCsvField(last),
+        escapeCsvField(problems),
+        escapeCsvField(features),
       ].join(",")
     })
     const csv = "\uFEFF" + header + lines.join("\n")
@@ -232,7 +241,10 @@ export function SentimentDashboard() {
           <Table className="text-[14px] [&_[data-slot=table-container]]:rounded-xl">
             <TableHeader>
               <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground">
+                <TableHead
+                  aria-sort={ariaSortState(sort, 0)}
+                  className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground"
+                >
                   <button
                     type="button"
                     className="cursor-pointer uppercase"
@@ -241,7 +253,10 @@ export function SentimentDashboard() {
                     Client ⇅
                   </button>
                 </TableHead>
-                <TableHead className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground">
+                <TableHead
+                  aria-sort={ariaSortState(sort, 1)}
+                  className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground"
+                >
                   <button
                     type="button"
                     className="cursor-pointer uppercase"
@@ -250,7 +265,10 @@ export function SentimentDashboard() {
                     Segment ⇅
                   </button>
                 </TableHead>
-                <TableHead className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground">
+                <TableHead
+                  aria-sort={ariaSortState(sort, 2)}
+                  className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground"
+                >
                   <button
                     type="button"
                     className="cursor-pointer uppercase"
@@ -265,7 +283,10 @@ export function SentimentDashboard() {
                 <TableHead className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase">
                   Sentiment
                 </TableHead>
-                <TableHead className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground">
+                <TableHead
+                  aria-sort={ariaSortState(sort, 5)}
+                  className="h-auto bg-muted px-4 py-3.5 text-[13px] font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground"
+                >
                   <button
                     type="button"
                     className="cursor-pointer uppercase"
@@ -378,9 +399,9 @@ export function SentimentDashboard() {
                             </p>
                           ) : (
                             <div className="space-y-2.5">
-                              {c.calls.map((call) => (
+                              {c.calls.map((call, callIdx) => (
                                 <Card
-                                  key={`${call.title}-${call.date}`}
+                                  key={`${c.id}-call-${callIdx}-${call.date}`}
                                   className="border-0 border-l-[3px] border-l-primary bg-card py-3.5 ring-0"
                                 >
                                   <div className="flex flex-col gap-1.5 px-4">

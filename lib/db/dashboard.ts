@@ -19,25 +19,6 @@ function getSql(): Sql | null {
   return neon(url)
 }
 
-async function migrateLegacyScoreTableIfNeeded(sql: Sql) {
-  const rows = (await sql`
-    SELECT 1 AS x
-    FROM information_schema.columns
-    WHERE table_schema = 'public'
-      AND table_name = 'score'
-      AND column_name = 'batch_id'
-    LIMIT 1
-  `) as { x: number }[]
-  if (rows.length > 0) return
-
-  const table = (await sql`
-    SELECT to_regclass('public.score') AS reg
-  `) as { reg: string | null }[]
-  if (!table[0]?.reg) return
-
-  await sql`DROP TABLE public.score CASCADE`
-}
-
 async function ensureSchema(sql: Sql) {
   await sql`
     CREATE TABLE IF NOT EXISTS organization (
@@ -46,8 +27,6 @@ async function ensureSchema(sql: Sql) {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `
-
-  await migrateLegacyScoreTableIfNeeded(sql)
 
   await sql`
     CREATE TABLE IF NOT EXISTS score (
@@ -103,7 +82,7 @@ function rowToClient(row: ScoreJoinRow): DashboardClient {
     hubspotUrl: row.hubspot_url,
     segment: row.segment,
     score: row.score_value,
-    scoreFilter: row.score_filter,
+    scoreFilter: row.score_filter as DashboardClient["scoreFilter"],
     trend: row.trend,
     trendSymbol: row.trend_symbol,
     sentiment: row.sentiment,

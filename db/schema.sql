@@ -31,6 +31,6 @@ CREATE TABLE IF NOT EXISTS score (
 );
 
 -- score.score_value = champ numérique "score" du JSON (1–3 ou null).
--- Migration depuis l’ancien schéma (PK sur organization_id seul) :
+-- Migration depuis un ancien schéma `score` sans batch_id : exécuter manuellement
 --   DROP TABLE IF EXISTS score CASCADE;
--- puis redémarrer l’app (recréation via ensureSchema).
+-- puis laisser l’app recréer la table (CREATE IF NOT EXISTS au premier accès DB).

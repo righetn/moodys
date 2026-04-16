@@ -1,5 +1,13 @@
 import type { output, ZodSafeParseResult } from "zod"
-import { z } from "zod"
+import { url, z } from "zod"
+
+const MAX_CLIENTS_PER_PAYLOAD = 500
+const MAX_PROBLEMS = 80
+const MAX_FEATURES = 80
+const MAX_CALLS = 100
+const MAX_SHORT = 500
+const MAX_MEDIUM = 4000
+const MAX_SEARCH_NAME = 2000
 
 export const dashboardFilterOptionSchema = z.object({
   value: z.string(),
@@ -7,30 +15,50 @@ export const dashboardFilterOptionSchema = z.object({
 })
 
 export const dashboardCallSchema = z.object({
-  title: z.string(),
-  sentiment: z.string(),
-  date: z.string(),
-  summary: z.string(),
+  title: z.string().min(1).max(MAX_SHORT),
+  sentiment: z.string().max(MAX_SHORT),
+  date: z.string().max(64),
+  summary: z.string().max(MAX_MEDIUM),
 })
 
-export const dashboardClientSchema = z.object({
-  id: z.string(),
-  searchName: z.string(),
-  displayName: z.string(),
-  hubspotUrl: z.string(),
-  segment: z.string(),
-  score: z.number().nullable(),
-  scoreFilter: z.string(),
-  trend: z.enum(["up", "down", "stable"]),
-  trendSymbol: z.string(),
-  sentiment: z.string().nullable(),
-  lastCall: z.string().nullable(),
-  problems: z.array(z.string()),
-  features: z.array(z.string()),
-  detailTitle: z.string(),
-  emptyMessage: z.string().nullable(),
-  calls: z.array(dashboardCallSchema),
-})
+const scoreValueSchema = z.number().int().min(1).max(3).nullable()
+
+export const dashboardClientSchema = z
+  .object({
+    id: z.string().min(1).max(64),
+    searchName: z.string().max(MAX_SEARCH_NAME),
+    displayName: z.string().min(1).max(MAX_SHORT),
+    hubspotUrl: url(),
+    segment: z.string().min(1).max(MAX_SHORT),
+    score: scoreValueSchema,
+    scoreFilter: z.enum(["1", "2", "3", "na"]),
+    trend: z.enum(["up", "down", "stable"]),
+    trendSymbol: z.string().max(16),
+    sentiment: z.string().max(MAX_SHORT).nullable(),
+    lastCall: z.string().max(32).nullable(),
+    problems: z.array(z.string().max(MAX_MEDIUM)).max(MAX_PROBLEMS),
+    features: z.array(z.string().max(MAX_MEDIUM)).max(MAX_FEATURES),
+    detailTitle: z.string().min(1).max(MAX_SHORT),
+    emptyMessage: z.string().max(MAX_MEDIUM).nullable(),
+    calls: z.array(dashboardCallSchema).max(MAX_CALLS),
+  })
+  .superRefine((data, ctx) => {
+    if (data.score === null) {
+      if (data.scoreFilter !== "na") {
+        ctx.addIssue({
+          code: "custom",
+          message: "score null implique scoreFilter « na »",
+          path: ["scoreFilter"],
+        })
+      }
+    } else if (String(data.score) !== data.scoreFilter) {
+      ctx.addIssue({
+        code: "custom",
+        message: "scoreFilter doit correspondre au score (ex. score 2 → « 2 »)",
+        path: ["scoreFilter"],
+      })
+    }
+  })
 
 export const dashboardKpiSchema = z.object({
   tone: z.string(),
@@ -40,11 +68,13 @@ export const dashboardKpiSchema = z.object({
 })
 
 /** Fichier `data.json` : uniquement un tableau de clients. */
-export const dashboardClientsArraySchema = z.array(dashboardClientSchema)
+export const dashboardClientsArraySchema = z
+  .array(dashboardClientSchema)
+  .max(MAX_CLIENTS_PER_PAYLOAD)
 
 /** Corps attendu pour `PUT /api/dashboard` (clients uniquement). */
 export const dashboardClientsPutPayloadSchema = z.object({
-  clients: z.array(dashboardClientSchema),
+  clients: z.array(dashboardClientSchema).max(MAX_CLIENTS_PER_PAYLOAD),
 })
 
 export type DashboardFilterOption = output<typeof dashboardFilterOptionSchema>
