@@ -17,7 +17,7 @@ async function main() {
   }
   const { batchId } = await appendDashboardClients(clients)
   console.log(
-    "Appended organization + score from data.json, batchId:",
+    "Appended organization + score row (calls, emails, CSM) from data.json, batchId:",
     batchId,
   )
 }

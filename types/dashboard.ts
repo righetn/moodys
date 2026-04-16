@@ -3,6 +3,7 @@ export {
   dashboardClientSchema,
   dashboardClientsArraySchema,
   dashboardClientsPutPayloadSchema,
+  dashboardEmailSchema,
   dashboardFilterOptionSchema,
   dashboardKpiSchema,
   parseClientsJson,
@@ -13,6 +14,7 @@ export type {
   DashboardCall,
   DashboardClient,
   DashboardClientsPutPayload,
+  DashboardEmail,
   DashboardFilterOption,
   DashboardKpi,
 } from "@/lib/schemas/dashboard"

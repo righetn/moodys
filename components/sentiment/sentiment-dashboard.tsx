@@ -52,11 +52,12 @@ function moodBadgeClass(score: number | null) {
 
 function callSentimentBadgeClass(sentiment: string) {
   const s = sentiment.toLowerCase()
-  if (s.includes("négatif") || s.includes("negatif"))
+  if (s.includes("négatif") || s.includes("negatif") || s.includes("negative"))
     return "bg-destructive text-primary-foreground"
-  if (s.includes("neutre"))
+  if (s.includes("neutre") || s.includes("neutral"))
     return "bg-chart-3/20 text-foreground"
-  if (s.includes("positif")) return "bg-primary/20 text-primary"
+  if (s.includes("positif") || s.includes("positive"))
+    return "bg-primary/20 text-primary"
   return "bg-muted text-muted-foreground"
 }
 
@@ -157,7 +158,13 @@ export function SentimentDashboard() {
         scoreFilter === "all" || c.scoreFilter === scoreFilter
       const matchSegment =
         segmentFilter === "all" || c.segment === segmentFilter
-      const matchCsm = csmFilter === "all"
+      const csmTrim = c.csm?.trim() ?? ""
+      const matchCsm =
+        csmFilter === "all" ||
+        (csmFilter === "__unassigned__" && !csmTrim) ||
+        (csmFilter !== "all" &&
+          csmFilter !== "__unassigned__" &&
+          csmTrim === csmFilter)
       return matchSearch && matchScore && matchSegment && matchCsm
     })
   }, [clients, search, scoreFilter, segmentFilter, csmFilter])
@@ -199,13 +206,14 @@ export function SentimentDashboard() {
       const last = c.lastCall ?? "—"
       const problems = c.problems.join(" ").replace(/\s+/g, " ").trim() || "—"
       const features = c.features.join(" ").replace(/\s+/g, " ").trim() || "—"
+      const csm = c.csm?.trim() || "—"
       return [
         escapeCsvField(c.displayName),
         escapeCsvField(mood),
         escapeCsvField(last),
         escapeCsvField(problems),
         escapeCsvField(features),
-        escapeCsvField("—"),
+        escapeCsvField(csm),
       ].join(",")
     })
     const csv = "\uFEFF" + header + lines.join("\n")
@@ -490,7 +498,7 @@ export function SentimentDashboard() {
                           )}
                         </TableCell>
                         <TableCell className="border-t border-border px-4 py-3 text-muted-foreground">
-                          —
+                          {c.csm?.trim() || "—"}
                         </TableCell>
                       </TableRow>
                       {expanded.has(c.id) ? (
@@ -503,7 +511,9 @@ export function SentimentDashboard() {
                               <h4 className="mb-4 text-sm font-semibold text-foreground">
                                 {c.detailTitle}
                               </h4>
-                              {c.emptyMessage ? (
+                              {c.emptyMessage &&
+                              c.calls.length === 0 &&
+                              c.emails.length === 0 ? (
                                 <p className="text-sm text-muted-foreground italic">
                                   {c.emptyMessage}
                                 </p>
@@ -514,50 +524,106 @@ export function SentimentDashboard() {
                                       <span>Modjo calls</span>
                                       <span className="h-px min-w-0 flex-1 bg-border" />
                                     </h5>
-                                    <div className="space-y-2.5">
-                                      {c.calls.map((call, callIdx) => (
-                                        <Card
-                                          key={`${c.id}-call-${callIdx}-${call.date}`}
-                                          className="border-0 border-l-[3px] border-l-primary bg-card py-3.5 ring-0"
-                                        >
-                                          <div className="flex flex-col gap-1.5 px-4">
-                                            <div className="flex flex-wrap items-center justify-between gap-2">
-                                              <span className="text-sm font-semibold text-foreground">
-                                                {call.title}
-                                              </span>
-                                              <div className="flex items-center gap-2">
-                                                <span
-                                                  className={cn(
-                                                    "rounded-full px-2.5 py-0.5 text-xs font-medium",
-                                                    callSentimentBadgeClass(
-                                                      call.sentiment,
-                                                    ),
-                                                  )}
-                                                >
-                                                  {call.sentiment}
+                                    {c.calls.length === 0 ? (
+                                      <p className="text-sm italic text-muted-foreground">
+                                        No calls in this export.
+                                      </p>
+                                    ) : (
+                                      <div className="space-y-2.5">
+                                        {c.calls.map((call, callIdx) => (
+                                          <Card
+                                            key={`${c.id}-call-${callIdx}-${call.date}`}
+                                            className="border-0 border-l-[3px] border-l-primary bg-card py-3.5 ring-0"
+                                          >
+                                            <div className="flex flex-col gap-1.5 px-4">
+                                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                                <span className="text-sm font-semibold text-foreground">
+                                                  {call.title}
                                                 </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                  {call.date}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                  <span
+                                                    className={cn(
+                                                      "rounded-full px-2.5 py-0.5 text-xs font-medium",
+                                                      callSentimentBadgeClass(
+                                                        call.sentiment,
+                                                      ),
+                                                    )}
+                                                  >
+                                                    {call.sentiment}
+                                                  </span>
+                                                  <span className="text-xs text-muted-foreground">
+                                                    {call.date}
+                                                  </span>
+                                                </div>
                                               </div>
+                                              <p className="text-[13px] leading-relaxed text-muted-foreground">
+                                                {call.summary}
+                                              </p>
                                             </div>
-                                            <p className="text-[13px] leading-relaxed text-muted-foreground">
-                                              {call.summary}
-                                            </p>
-                                          </div>
-                                        </Card>
-                                      ))}
-                                    </div>
+                                          </Card>
+                                        ))}
+                                      </div>
+                                    )}
                                   </section>
                                   <section className="min-w-0 space-y-3">
                                     <h5 className="flex items-center gap-2 text-[11px] font-bold tracking-wide text-muted-foreground uppercase">
                                       <span>HubSpot emails</span>
                                       <span className="h-px min-w-0 flex-1 bg-border" />
                                     </h5>
-                                    <p className="rounded-lg border border-dashed border-border bg-muted/30 px-4 py-3 text-sm italic text-muted-foreground">
-                                      Email snippets are not included in the current JSON
-                                      export.
-                                    </p>
+                                    {c.emails.length === 0 ? (
+                                      <p className="rounded-lg border border-dashed border-border bg-muted/30 px-4 py-3 text-sm italic text-muted-foreground">
+                                        No emails in this export.
+                                      </p>
+                                    ) : (
+                                      <div className="space-y-2.5">
+                                        {c.emails.map((email, emailIdx) => (
+                                          <Card
+                                            key={`${c.id}-email-${emailIdx}-${email.date}`}
+                                            className="border-0 border-l-[3px] border-l-chart-3 bg-card py-3 ring-0"
+                                          >
+                                            <div className="flex flex-col gap-1.5 px-4">
+                                              <div className="text-sm font-semibold text-foreground">
+                                                {email.subject}
+                                              </div>
+                                              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                                <span
+                                                  className={
+                                                    email.direction === "inbound"
+                                                      ? "font-medium text-foreground"
+                                                      : "font-medium text-foreground"
+                                                  }
+                                                >
+                                                  {email.direction === "inbound"
+                                                    ? "← Inbound"
+                                                    : "→ Outbound"}
+                                                </span>
+                                                <span
+                                                  className={cn(
+                                                    "rounded-full px-2 py-0.5 text-[11px] font-medium",
+                                                    callSentimentBadgeClass(
+                                                      email.sentiment,
+                                                    ),
+                                                  )}
+                                                >
+                                                  {email.sentiment}
+                                                </span>
+                                                <span>{email.sender}</span>
+                                                <span>{email.date}</span>
+                                                <a
+                                                  href={email.hubspotUrl}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="font-medium text-primary hover:underline"
+                                                  onClick={(e) => e.stopPropagation()}
+                                                >
+                                                  HubSpot ↗
+                                                </a>
+                                              </div>
+                                            </div>
+                                          </Card>
+                                        ))}
+                                      </div>
+                                    )}
                                   </section>
                                 </div>
                               )}

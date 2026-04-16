@@ -5,6 +5,7 @@ const MAX_CLIENTS_PER_PAYLOAD = 500
 const MAX_PROBLEMS = 80
 const MAX_FEATURES = 80
 const MAX_CALLS = 100
+const MAX_EMAILS = 100
 const MAX_SHORT = 500
 const MAX_MEDIUM = 4000
 const MAX_SEARCH_NAME = 2000
@@ -21,6 +22,15 @@ export const dashboardCallSchema = z.object({
   summary: z.string().max(MAX_MEDIUM),
 })
 
+export const dashboardEmailSchema = z.object({
+  subject: z.string().min(1).max(MAX_SHORT),
+  direction: z.enum(["inbound", "outbound"]),
+  sentiment: z.string().max(MAX_SHORT),
+  sender: z.string().max(MAX_SHORT),
+  date: z.string().max(64),
+  hubspotUrl: url(),
+})
+
 const scoreValueSchema = z.number().int().min(1).max(3).nullable()
 
 export const dashboardClientSchema = z
@@ -32,15 +42,14 @@ export const dashboardClientSchema = z
     segment: z.string().min(1).max(MAX_SHORT),
     score: scoreValueSchema,
     scoreFilter: z.enum(["1", "2", "3", "na"]),
-    trend: z.enum(["up", "down", "stable"]),
-    trendSymbol: z.string().max(16),
-    sentiment: z.string().max(MAX_SHORT).nullable(),
     lastCall: z.string().max(32).nullable(),
     problems: z.array(z.string().max(MAX_MEDIUM)).max(MAX_PROBLEMS),
     features: z.array(z.string().max(MAX_MEDIUM)).max(MAX_FEATURES),
     detailTitle: z.string().min(1).max(MAX_SHORT),
     emptyMessage: z.string().max(MAX_MEDIUM).nullable(),
     calls: z.array(dashboardCallSchema).max(MAX_CALLS),
+    emails: z.array(dashboardEmailSchema).max(MAX_EMAILS),
+    csm: z.string().max(200).nullable(),
   })
   .superRefine((data, ctx) => {
     if (data.score === null) {
@@ -79,6 +88,7 @@ export const dashboardClientsPutPayloadSchema = z.object({
 
 export type DashboardFilterOption = output<typeof dashboardFilterOptionSchema>
 export type DashboardCall = output<typeof dashboardCallSchema>
+export type DashboardEmail = output<typeof dashboardEmailSchema>
 export type DashboardClient = output<typeof dashboardClientSchema>
 export type DashboardKpi = output<typeof dashboardKpiSchema>
 export type DashboardClientsPutPayload = output<

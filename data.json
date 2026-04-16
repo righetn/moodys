@@ -7,15 +7,14 @@
     "segment": "Key Account",
     "score": null,
     "scoreFilter": "na",
-    "trend": "stable",
-    "trendSymbol": "—",
-    "sentiment": "—",
     "lastCall": null,
     "problems": [],
     "features": [],
     "detailTitle": "Cité internationale universitaire de Paris - RH",
     "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-    "calls": []
+    "calls": [],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "45987145386",
@@ -25,15 +24,14 @@
     "segment": "Small Account",
     "score": null,
     "scoreFilter": "na",
-    "trend": "stable",
-    "trendSymbol": "—",
-    "sentiment": "—",
     "lastCall": null,
     "problems": [],
     "features": [],
     "detailTitle": "Cheerz RH",
     "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-    "calls": []
+    "calls": [],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "44788785503",
@@ -43,15 +41,14 @@
     "segment": "Key Account",
     "score": null,
     "scoreFilter": "na",
-    "trend": "stable",
-    "trendSymbol": "—",
-    "sentiment": "—",
     "lastCall": null,
     "problems": [],
     "features": [],
     "detailTitle": "Pasqal - Corporate",
     "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-    "calls": []
+    "calls": [],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "41392015388",
@@ -61,12 +58,11 @@
     "segment": "Medium Account",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "up",
-    "trendSymbol": "↑",
-    "sentiment": "Positif",
     "lastCall": "2026-03-18",
     "problems": [],
-    "features": ["Amélioration du workflow de signature"],
+    "features": [
+      "Amélioration du workflow de signature"
+    ],
     "detailTitle": "Détail des 3 derniers appels — Polarise",
     "emptyMessage": null,
     "calls": [
@@ -88,7 +84,26 @@
         "date": "2026-01-15",
         "summary": "Point rapide, tout fonctionne bien. Quelques questions sur les nouvelles fonctionnalités."
       }
-    ]
+    ],
+    "emails": [
+      {
+        "subject": "Re: Tomorro <> Polarise - Follow up meeting",
+        "direction": "outbound",
+        "sentiment": "Neutral",
+        "sender": "thibaut@tomorro.com",
+        "date": "26/03/24",
+        "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/41392015388"
+      },
+      {
+        "subject": "Zugesagt: Tomorro <> Polarise - Follow up meeting - juin 2026",
+        "direction": "inbound",
+        "sentiment": "Neutral",
+        "sender": "m.damm@polarise.eu",
+        "date": "15/04/26",
+        "hubspotUrl": "https://app.hubspot.com/contacts/7016971/record/0-2/41392015388"
+      }
+    ],
+    "csm": null
   },
   {
     "id": "40695694084",
@@ -98,15 +113,14 @@
     "segment": "Medium Account",
     "score": null,
     "scoreFilter": "na",
-    "trend": "stable",
-    "trendSymbol": "—",
-    "sentiment": "—",
     "lastCall": null,
     "problems": [],
     "features": [],
     "detailTitle": "Ozi SAS",
     "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-    "calls": []
+    "calls": [],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "35599744087",
@@ -116,15 +130,14 @@
     "segment": "Small Account",
     "score": null,
     "scoreFilter": "na",
-    "trend": "stable",
-    "trendSymbol": "—",
-    "sentiment": "—",
     "lastCall": null,
     "problems": [],
     "features": [],
     "detailTitle": "Kalhyge",
     "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-    "calls": []
+    "calls": [],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "35251683353",
@@ -134,15 +147,14 @@
     "segment": "Small Account",
     "score": null,
     "scoreFilter": "na",
-    "trend": "stable",
-    "trendSymbol": "—",
-    "sentiment": "—",
     "lastCall": null,
     "problems": [],
     "features": [],
     "detailTitle": "Vertone RH",
     "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-    "calls": []
+    "calls": [],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "34261862152",
@@ -152,16 +164,16 @@
     "segment": "Enterprise",
     "score": 1,
     "scoreFilter": "1",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Négatif",
     "lastCall": "2026-03-25",
     "problems": [
       "Problèmes récurrents d'intégration",
       "Lenteurs signalées sur l'éditeur",
       "Manque de support réactif"
     ],
-    "features": ["Intégration SIRH améliorée", "Performance éditeur"],
+    "features": [
+      "Intégration SIRH améliorée",
+      "Performance éditeur"
+    ],
     "detailTitle": "Détail des 4 derniers appels — GL Events RH",
     "emptyMessage": null,
     "calls": [
@@ -189,7 +201,9 @@
         "date": "2026-01-20",
         "summary": "Discussion sur les axes d'amélioration. Le client reste prudent mais ouvert."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "34245827142",
@@ -199,12 +213,13 @@
     "segment": "Small Account",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Neutre",
     "lastCall": "2026-03-10",
-    "problems": ["Quelques difficultés d'adoption par les équipes"],
-    "features": ["Modèles de contrats plus flexibles"],
+    "problems": [
+      "Quelques difficultés d'adoption par les équipes"
+    ],
+    "features": [
+      "Modèles de contrats plus flexibles"
+    ],
     "detailTitle": "Détail des 2 derniers appels — Panda",
     "emptyMessage": null,
     "calls": [
@@ -220,7 +235,9 @@
         "date": "2026-01-28",
         "summary": "Pas de problème majeur. Adoption encore partielle au sein des équipes."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "34259224328",
@@ -230,9 +247,6 @@
     "segment": "Enterprise",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Neutre",
     "lastCall": "2026-03-20",
     "problems": [
       "Complexité de configuration pour les contrats internationaux"
@@ -262,7 +276,9 @@
         "date": "2026-01-10",
         "summary": "Utilisation régulière. Le client attend des améliorations sur la gestion des entités juridiques."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "33827234094",
@@ -272,9 +288,6 @@
     "segment": "Medium Account",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "up",
-    "trendSymbol": "↑",
-    "sentiment": "Positif",
     "lastCall": "2026-04-02",
     "problems": [],
     "features": [],
@@ -299,7 +312,9 @@
         "date": "2026-01-05",
         "summary": "Bon bilan de fin d'année. Quelques ajustements demandés mais rien de bloquant."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "33695278612",
@@ -309,15 +324,14 @@
     "segment": "Strategic Account",
     "score": null,
     "scoreFilter": "na",
-    "trend": "stable",
-    "trendSymbol": "—",
-    "sentiment": "—",
     "lastCall": null,
     "problems": [],
     "features": [],
     "detailTitle": "Infopro Digital RH",
     "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-    "calls": []
+    "calls": [],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "50095592233",
@@ -327,12 +341,11 @@
     "segment": "Small Account",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Positif",
     "lastCall": "2026-03-28",
     "problems": [],
-    "features": ["API d'export"],
+    "features": [
+      "API d'export"
+    ],
     "detailTitle": "Détail des 2 derniers appels — Enix",
     "emptyMessage": null,
     "calls": [
@@ -348,7 +361,9 @@
         "date": "2026-02-18",
         "summary": "Tout fonctionne bien. Le client apprécie la simplicité de l'outil."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "25976217869",
@@ -358,12 +373,14 @@
     "segment": "Medium Account",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Neutre",
     "lastCall": "2026-03-12",
-    "problems": ["Difficulté à former les nouveaux arrivants"],
-    "features": ["Tutoriels intégrés", "Parcours d'onboarding utilisateur"],
+    "problems": [
+      "Difficulté à former les nouveaux arrivants"
+    ],
+    "features": [
+      "Tutoriels intégrés",
+      "Parcours d'onboarding utilisateur"
+    ],
     "detailTitle": "Détail des 2 derniers appels — Habitation Batiment",
     "emptyMessage": null,
     "calls": [
@@ -379,7 +396,9 @@
         "date": "2026-02-05",
         "summary": "Utilisation correcte mais pas optimale. Le client aimerait un meilleur onboarding pour ses équipes."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "42606417725",
@@ -389,15 +408,14 @@
     "segment": "Small Account",
     "score": null,
     "scoreFilter": "na",
-    "trend": "stable",
-    "trendSymbol": "—",
-    "sentiment": "—",
     "lastCall": null,
     "problems": [],
     "features": [],
     "detailTitle": "GP Explorer",
     "emptyMessage": "Aucun appel trouvé avec les équipes CX/CSM/COM sur Modjo.",
-    "calls": []
+    "calls": [],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "25089959216",
@@ -407,16 +425,16 @@
     "segment": "Small Account",
     "score": 1,
     "scoreFilter": "1",
-    "trend": "down",
-    "trendSymbol": "↓",
-    "sentiment": "Négatif",
     "lastCall": "2026-04-05",
     "problems": [
       "Bugs fréquents sur la signature électronique",
       "Temps de réponse support trop long",
       "Fonctionnalités manquantes vs concurrent"
     ],
-    "features": ["Signature mobile", "Rappels automatiques"],
+    "features": [
+      "Signature mobile",
+      "Rappels automatiques"
+    ],
     "detailTitle": "Détail des 3 derniers appels — POUSSE",
     "emptyMessage": null,
     "calls": [
@@ -438,7 +456,9 @@
         "date": "2026-02-08",
         "summary": "Quelques irritants mais le client reste ouvert. Demande d'améliorations sur la signature mobile."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "11178856724",
@@ -448,11 +468,10 @@
     "segment": "Small Account",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Neutre",
     "lastCall": "2026-03-01",
-    "problems": ["Lenteur occasionnelle"],
+    "problems": [
+      "Lenteur occasionnelle"
+    ],
     "features": [],
     "detailTitle": "Détail des 2 derniers appels — Avignon Tourisme",
     "emptyMessage": null,
@@ -469,7 +488,9 @@
         "date": "2026-01-22",
         "summary": "Le client est globalement satisfait. Usage basique mais efficace."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "34668485696",
@@ -479,12 +500,11 @@
     "segment": "Medium Account",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "up",
-    "trendSymbol": "↑",
-    "sentiment": "Positif",
     "lastCall": "2026-04-08",
     "problems": [],
-    "features": ["Dashboard analytics"],
+    "features": [
+      "Dashboard analytics"
+    ],
     "detailTitle": "Détail des 3 derniers appels — Liora (ex DataScientest)",
     "emptyMessage": null,
     "calls": [
@@ -506,7 +526,9 @@
         "date": "2026-01-30",
         "summary": "Bonne utilisation. Quelques questions sur les fonctionnalités avancées."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "11176687685",
@@ -516,12 +538,13 @@
     "segment": "Small Account",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "up",
-    "trendSymbol": "↑",
-    "sentiment": "Neutre",
     "lastCall": "2026-03-22",
-    "problems": ["Complexité perçue pour les utilisateurs non-juristes"],
-    "features": ["Interface simplifiée"],
+    "problems": [
+      "Complexité perçue pour les utilisateurs non-juristes"
+    ],
+    "features": [
+      "Interface simplifiée"
+    ],
     "detailTitle": "Détail des 3 derniers appels — Le Point",
     "emptyMessage": null,
     "calls": [
@@ -543,7 +566,9 @@
         "date": "2026-01-08",
         "summary": "Usage en progression. Le client demande une interface plus intuitive."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "11146959986",
@@ -553,9 +578,6 @@
     "segment": "Medium Account",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Positif",
     "lastCall": "2026-03-15",
     "problems": [],
     "features": [],
@@ -574,7 +596,9 @@
         "date": "2026-02-01",
         "summary": "Tout roule. Le client est un ambassadeur de Tomorro dans son réseau."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "11147153965",
@@ -584,12 +608,11 @@
     "segment": "Medium Account",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Positif",
     "lastCall": "2026-03-28",
     "problems": [],
-    "features": ["Clause library étendue pour pharma"],
+    "features": [
+      "Clause library étendue pour pharma"
+    ],
     "detailTitle": "Détail des 2 derniers appels — MaaT Pharma",
     "emptyMessage": null,
     "calls": [
@@ -605,7 +628,9 @@
         "date": "2026-02-20",
         "summary": "Le client apprécie la conformité et la traçabilité. Bon feedback global."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "22123971242",
@@ -615,11 +640,10 @@
     "segment": "Small Account",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Neutre",
     "lastCall": "2026-03-08",
-    "problems": ["Sous-utilisation des fonctionnalités avancées"],
+    "problems": [
+      "Sous-utilisation des fonctionnalités avancées"
+    ],
     "features": [],
     "detailTitle": "Détail des 2 derniers appels — Groupe Eleven",
     "emptyMessage": null,
@@ -636,7 +660,9 @@
         "date": "2026-01-25",
         "summary": "Pas de problème mais pas d'enthousiasme non plus. Le client reste sur un usage minimal."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "11142892876",
@@ -646,12 +672,13 @@
     "segment": "Small Account",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Neutre",
     "lastCall": "2026-03-18",
-    "problems": ["Manque de visibilité sur le ROI"],
-    "features": ["Reporting ROI"],
+    "problems": [
+      "Manque de visibilité sur le ROI"
+    ],
+    "features": [
+      "Reporting ROI"
+    ],
     "detailTitle": "Détail des 2 derniers appels — Pharmafield Groupe",
     "emptyMessage": null,
     "calls": [
@@ -667,7 +694,9 @@
         "date": "2026-02-10",
         "summary": "Utilisation stable. Le client aimerait un reporting plus détaillé."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "11143242280",
@@ -677,16 +706,16 @@
     "segment": "Small Account",
     "score": 1,
     "scoreFilter": "1",
-    "trend": "down",
-    "trendSymbol": "↓",
-    "sentiment": "Négatif",
     "lastCall": "2026-04-01",
     "problems": [
       "Fonctionnalités insuffisantes pour le gaming",
       "Mauvaise expérience utilisateur",
       "Lenteurs chroniques"
     ],
-    "features": ["Templates secteur gaming", "Performance globale"],
+    "features": [
+      "Templates secteur gaming",
+      "Performance globale"
+    ],
     "detailTitle": "Détail des 3 derniers appels — TapNation",
     "emptyMessage": null,
     "calls": [
@@ -708,7 +737,9 @@
         "date": "2026-02-05",
         "summary": "Le client exprime des réserves mais reste en discussion."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "11141446818",
@@ -718,12 +749,13 @@
     "segment": "Small Account",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Neutre",
     "lastCall": "2026-03-20",
-    "problems": ["Formation insuffisante des équipes"],
-    "features": ["Onboarding amélioré"],
+    "problems": [
+      "Formation insuffisante des équipes"
+    ],
+    "features": [
+      "Onboarding amélioré"
+    ],
     "detailTitle": "Détail des 2 derniers appels — HEROIKS",
     "emptyMessage": null,
     "calls": [
@@ -739,7 +771,9 @@
         "date": "2026-02-12",
         "summary": "Utilisation en cours de déploiement. Pas de problème majeur mais pas d'enthousiasme."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "10574668345",
@@ -749,9 +783,6 @@
     "segment": "Medium Account",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Positif",
     "lastCall": "2026-03-25",
     "problems": [],
     "features": [],
@@ -770,7 +801,9 @@
         "date": "2026-02-15",
         "summary": "Adoption complète. Le client salue la qualité du produit et du support."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "10485002793",
@@ -780,9 +813,6 @@
     "segment": "Medium Account",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "stable",
-    "trendSymbol": "→",
-    "sentiment": "Positif",
     "lastCall": "2026-03-30",
     "problems": [],
     "features": [],
@@ -801,7 +831,9 @@
         "date": "2026-02-22",
         "summary": "Utilisation exemplaire. Le client est un promoteur actif de Tomorro."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "48178785178",
@@ -811,15 +843,15 @@
     "segment": "Key Account",
     "score": 2,
     "scoreFilter": "2",
-    "trend": "down",
-    "trendSymbol": "↓",
-    "sentiment": "Neutre",
     "lastCall": "2026-04-10",
     "problems": [
       "Complexité des workflows multi-approbateurs",
       "Temps de chargement"
     ],
-    "features": ["Workflow d'approbation simplifié", "Performance"],
+    "features": [
+      "Workflow d'approbation simplifié",
+      "Performance"
+    ],
     "detailTitle": "Détail des 3 derniers appels — Pasqal",
     "emptyMessage": null,
     "calls": [
@@ -841,7 +873,9 @@
         "date": "2026-02-08",
         "summary": "Bonne satisfaction. Le client envisage d'étendre l'usage."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "10433846553",
@@ -851,16 +885,16 @@
     "segment": "Small Account",
     "score": 1,
     "scoreFilter": "1",
-    "trend": "down",
-    "trendSymbol": "↓",
-    "sentiment": "Négatif",
     "lastCall": "2026-04-12",
     "problems": [
       "Bugs bloquants sur la signature",
       "Support non réactif",
       "Perte de documents signalée"
     ],
-    "features": ["Fiabilité signature", "Sauvegarde automatique"],
+    "features": [
+      "Fiabilité signature",
+      "Sauvegarde automatique"
+    ],
     "detailTitle": "Détail des 4 derniers appels — Inside",
     "emptyMessage": null,
     "calls": [
@@ -888,7 +922,9 @@
         "date": "2026-01-18",
         "summary": "Premiers signaux de mécontentement. Le client remonte quelques bugs."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   },
   {
     "id": "10256489519",
@@ -898,12 +934,11 @@
     "segment": "Enterprise",
     "score": 3,
     "scoreFilter": "3",
-    "trend": "up",
-    "trendSymbol": "↑",
-    "sentiment": "Positif",
     "lastCall": "2026-04-05",
     "problems": [],
-    "features": ["Connecteur ERP"],
+    "features": [
+      "Connecteur ERP"
+    ],
     "detailTitle": "Détail des 3 derniers appels — MF BRANDS GROUP",
     "emptyMessage": null,
     "calls": [
@@ -925,6 +960,8 @@
         "date": "2026-02-05",
         "summary": "Bonne progression. Le client pose des questions sur les intégrations futures."
       }
-    ]
+    ],
+    "emails": [],
+    "csm": null
   }
 ]

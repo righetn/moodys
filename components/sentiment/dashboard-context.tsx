@@ -23,10 +23,6 @@ const SCORE_FILTER_OPTIONS: DashboardFilterOption[] = [
   { value: "na", label: "No data" },
 ]
 
-const CSM_FILTER_OPTIONS: DashboardFilterOption[] = [
-  { value: "all", label: "All CSMs" },
-]
-
 export type DashboardContextValue = {
   clients: DashboardClient[]
   kpis: DashboardKpi[]
@@ -68,8 +64,32 @@ export function DashboardProvider({
         dynamic.push({ value: c.segment, label: c.segment })
       }
     }
-    dynamic.sort((a, b) => a.label.localeCompare(b.label, "fr"))
+    dynamic.sort((a, b) => a.label.localeCompare(b.label, "en"))
     return [{ value: "all", label: "All segments" }, ...dynamic]
+  }, [clients])
+
+  const csmOptions = useMemo(() => {
+    const seen = new Set<string>()
+    let hasUnassigned = false
+    for (const c of clients) {
+      const v = c.csm?.trim()
+      if (!v) {
+        hasUnassigned = true
+        continue
+      }
+      if (!seen.has(v)) {
+        seen.add(v)
+      }
+    }
+    const sorted = [...seen].sort((a, b) => a.localeCompare(b, "en"))
+    const out: DashboardFilterOption[] = [{ value: "all", label: "All CSMs" }]
+    for (const v of sorted) {
+      out.push({ value: v, label: v })
+    }
+    if (hasUnassigned) {
+      out.push({ value: "__unassigned__", label: "—" })
+    }
+    return out
   }, [clients])
 
   const value = useMemo(
@@ -86,7 +106,7 @@ export function DashboardProvider({
       setCsmFilter,
       segmentOptions,
       scoreOptions: SCORE_FILTER_OPTIONS,
-      csmOptions: CSM_FILTER_OPTIONS,
+      csmOptions,
     }),
     [
       clients,
@@ -96,6 +116,7 @@ export function DashboardProvider({
       segmentFilter,
       csmFilter,
       segmentOptions,
+      csmOptions,
     ],
   )
 

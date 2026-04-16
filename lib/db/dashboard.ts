@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto"
 import { neon } from "@neondatabase/serverless"
 
 import { parseClientsJson } from "@/lib/schemas/dashboard"
-import type { DashboardCall, DashboardClient } from "@/types/dashboard"
+import type { DashboardCall, DashboardClient, DashboardEmail } from "@/types/dashboard"
 
 import fallbackRaw from "@/data.json"
 
@@ -39,20 +39,32 @@ async function ensureSchema(sql: Sql) {
       segment TEXT NOT NULL,
       score_value SMALLINT,
       score_filter TEXT NOT NULL,
-      trend TEXT NOT NULL,
-      trend_symbol TEXT NOT NULL,
-      sentiment TEXT,
       last_call TEXT,
       problems JSONB NOT NULL DEFAULT '[]'::jsonb,
       features JSONB NOT NULL DEFAULT '[]'::jsonb,
       detail_title TEXT NOT NULL,
       empty_message TEXT,
       calls JSONB NOT NULL DEFAULT '[]'::jsonb,
+      emails JSONB NOT NULL DEFAULT '[]'::jsonb,
+      csm TEXT,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      CONSTRAINT score_trend_check CHECK (trend IN ('up', 'down', 'stable')),
       UNIQUE (organization_id, batch_id)
     )
   `
+
+  await migrateScoreTable(sql)
+}
+
+/** Idempotent upgrades from legacy `score` rows (trend / sentiment / no emails). */
+async function migrateScoreTable(sql: Sql) {
+  await sql`ALTER TABLE score DROP CONSTRAINT IF EXISTS score_trend_check`
+  await sql`ALTER TABLE score DROP COLUMN IF EXISTS trend`
+  await sql`ALTER TABLE score DROP COLUMN IF EXISTS trend_symbol`
+  await sql`ALTER TABLE score DROP COLUMN IF EXISTS sentiment`
+  await sql`
+    ALTER TABLE score ADD COLUMN IF NOT EXISTS emails JSONB NOT NULL DEFAULT '[]'::jsonb
+  `
+  await sql`ALTER TABLE score ADD COLUMN IF NOT EXISTS csm TEXT`
 }
 
 type ScoreJoinRow = {
@@ -63,15 +75,14 @@ type ScoreJoinRow = {
   segment: string
   score_value: number | null
   score_filter: string
-  trend: DashboardClient["trend"]
-  trend_symbol: string
-  sentiment: string | null
   last_call: string | null
   problems: string[]
   features: string[]
   detail_title: string
   empty_message: string | null
   calls: DashboardCall[]
+  emails: DashboardEmail[]
+  csm: string | null
 }
 
 function rowToClient(row: ScoreJoinRow): DashboardClient {
@@ -83,15 +94,14 @@ function rowToClient(row: ScoreJoinRow): DashboardClient {
     segment: row.segment,
     score: row.score_value,
     scoreFilter: row.score_filter as DashboardClient["scoreFilter"],
-    trend: row.trend,
-    trendSymbol: row.trend_symbol,
-    sentiment: row.sentiment,
     lastCall: row.last_call,
     problems: row.problems ?? [],
     features: row.features ?? [],
     detailTitle: row.detail_title,
     emptyMessage: row.empty_message,
     calls: row.calls ?? [],
+    emails: row.emails ?? [],
+    csm: row.csm ?? null,
   }
 }
 
@@ -120,15 +130,14 @@ export async function getClientsFromDb(): Promise<DashboardClient[] | null> {
       s.segment,
       s.score_value,
       s.score_filter,
-      s.trend,
-      s.trend_symbol,
-      s.sentiment,
       s.last_call,
       s.problems,
       s.features,
       s.detail_title,
       s.empty_message,
-      s.calls
+      s.calls,
+      s.emails,
+      s.csm
     FROM latest lb
     INNER JOIN score s ON s.batch_id = lb.batch_id
     INNER JOIN organization o ON o.id = s.organization_id
@@ -170,6 +179,7 @@ export async function appendDashboardClients(
     const problemsJson = JSON.stringify(c.problems)
     const featuresJson = JSON.stringify(c.features)
     const callsJson = JSON.stringify(c.calls)
+    const emailsJson = JSON.stringify(c.emails)
     inserts.push(
       sql`
         INSERT INTO score (
@@ -181,15 +191,14 @@ export async function appendDashboardClients(
           segment,
           score_value,
           score_filter,
-          trend,
-          trend_symbol,
-          sentiment,
           last_call,
           problems,
           features,
           detail_title,
           empty_message,
           calls,
+          emails,
+          csm,
           updated_at
         )
         VALUES (
@@ -201,15 +210,14 @@ export async function appendDashboardClients(
           ${c.segment},
           ${c.score},
           ${c.scoreFilter},
-          ${c.trend},
-          ${c.trendSymbol},
-          ${c.sentiment},
           ${c.lastCall},
           ${problemsJson}::jsonb,
           ${featuresJson}::jsonb,
           ${c.detailTitle},
           ${c.emptyMessage},
           ${callsJson}::jsonb,
+          ${emailsJson}::jsonb,
+          ${c.csm},
           NOW()
         )
       `,

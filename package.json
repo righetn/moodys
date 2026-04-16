@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:seed": "tsx scripts/seed-dashboard.ts"
+    "db:reset": "tsx scripts/reset-dashboard-db.ts",
+    "db:seed": "tsx scripts/seed-dashboard.ts",
+    "db:reseed": "npm run db:reset && npm run db:seed"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
